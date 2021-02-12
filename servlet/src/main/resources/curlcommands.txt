@@ -1,0 +1,3 @@
+curl -v http://localhost:8081/counter
+curl -v -X POST http://localhost:8081/counter
+curl -v -H "Substraction-Value: 2" -X DELETE http://localhost:8081/counter
