@@ -20,6 +20,11 @@ public class Counter {
         return value;
     }
 
+    public Long clear() {
+        value = 0L;
+        return value;
+    }
+
     public Long getCurrentValue() {
         return value;
     }

@@ -7,19 +7,24 @@ import java.io.IOException;
 
 public class CounterServlet extends HttpServlet {
 
-    private Counter counter = new Counter();
+    private Counter counter;
+
+    @Override
+    public void init() throws ServletException {
+        this.counter = (Counter) getServletContext().getAttribute("counter");
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setStatus(HttpServletResponse.SC_OK);
-        resp.getWriter().print("Current counter: " + counter.getCurrentValue());
+        resp.getWriter().print(counter.getCurrentValue());
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setStatus(HttpServletResponse.SC_OK);
         counter.postIncrement();
-        resp.getWriter().print("Current counter: " + counter.getCurrentValue());
+        resp.getWriter().print(counter.getCurrentValue());
     }
 
     @Override

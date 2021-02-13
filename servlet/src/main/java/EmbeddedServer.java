@@ -1,18 +1,28 @@
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 
 public class EmbeddedServer {
 
     private Server server;
+    private Counter counter = new Counter();
 
     public Server run() throws Exception {
         server = new Server(8081);
-        ServletHandler handler = new ServletHandler();
-        handler.addServletWithMapping(CounterServlet.class, "/counter");
-        server.setHandler(handler);
+        ServletContextHandler context = prepareContext();
+        server.setHandler(context);
         server.start();
-        server.start();
+        server.join();
         return server;
+    }
+
+    private ServletContextHandler prepareContext() {
+        ServletContextHandler context = new ServletContextHandler();
+        context.setContextPath("/");
+        context.setAttribute("counter", counter);
+        context.addServlet(CounterServlet.class, "/counter");
+        context.addServlet(ClearCounterServlet.class, "/counter/clear");
+        return context;
     }
 
 }

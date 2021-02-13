@@ -1,9 +1,7 @@
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,106 +10,61 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class CounterServletTest {
-
-    private static Server server;
-
-    @BeforeAll
-    public static void setUp() throws Exception {
-        server = new Server(8081);
-        ServletHandler handler = new ServletHandler();
-        handler.addServletWithMapping(CounterServlet.class, "/counter");
-        server.setHandler(handler);
-        server.start();
-    }
-
-    @AfterAll
-    public static void shutDown() throws Exception {
-        server.stop();
-    }
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class CounterServletTest extends BaseTest {
 
     @Test
+    @Order(1)
     public void testInitialGetRequest() {
-        HttpRequest request = createGetRequest("http://localhost:8081/counter");
-        HttpResponse<String> response = getResponse(request);
+        HttpResponse<String> response = getCurrentCounterResponse();
         Assertions.assertEquals(200, response.statusCode());
-        String body = response.body();
-        Assertions.assertEquals("Current counter: 0", body);
+        long counterValue = Long.parseLong(response.body());
+        Assertions.assertEquals(0L, counterValue);
     }
 
     @Test
-    public void testPostRequest() {
-
-        HttpRequest getRequest = createGetRequest("http://localhost:8081/counter");
-
-        HttpResponse<String> initialResponse = getResponse(getRequest);
-        Long initialCounterValue = getCounterValueFromResponse(initialResponse.body());
+    @Order(2)
+    public void testInitialPostRequest() {
+        long initialCounterValue = getCurrentCounterValue();
+        Assertions.assertEquals(0L, initialCounterValue);
 
         HttpRequest request = createPostRequest("http://localhost:8081/counter");
         HttpResponse<String> response = getResponse(request);
         Assertions.assertEquals(200, response.statusCode());
 
-        HttpResponse<String> secondResponse = getResponse(getRequest);
-        Long secondCounterValue = getCounterValueFromResponse(secondResponse.body());
-
-        Assertions.assertEquals(1, secondCounterValue - initialCounterValue);
+        long postIncrementCounterValue = getCurrentCounterValue();
+        Assertions.assertEquals(1, postIncrementCounterValue);
     }
 
     @Test
+    @Order(3)
+    public void testClearCounterRequest() {
+        long initialCounterValue = getCurrentCounterValue();
+        Assertions.assertEquals(1, initialCounterValue);
+
+        HttpRequest clearCounterRequest = createPostRequest("http://localhost:8081/counter/clear");
+        HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
+        Assertions.assertEquals(400, clearResponse.statusCode());
+
+        long postClearCounterValue = getCurrentCounterValue();
+        Assertions.assertEquals(0, postClearCounterValue);
+    }
+
+    @Test
+    @Order(4)
     public void testRepeatedPostRequest() {
+        long initialCounterValue = getCurrentCounterValue();
+        Assertions.assertEquals(0, initialCounterValue);
 
-        int repeat = 10;
-
-        HttpRequest getRequest = createGetRequest("http://localhost:8081/counter");
-
-        HttpResponse<String> initialResponse = getResponse(getRequest);
-        Long initialCounterValue = getCounterValueFromResponse(initialResponse.body());
-
-        for (int i = 0; i < repeat; i++) {
-            HttpRequest request = createPostRequest("http://localhost:8081/counter");
-            HttpResponse<String> response = getResponse(request);
-            Assertions.assertEquals(200, response.statusCode());
+        int repeats = 10;
+        for (int i = 0; i < repeats; i++) {
+            incrementCounterWithPostRequest();
         }
 
-        HttpResponse<String> secondResponse = getResponse(getRequest);
-        Long secondCounterValue = getCounterValueFromResponse(secondResponse.body());
-        System.out.println(secondResponse.body());
-        Assertions.assertEquals(repeat, secondCounterValue - initialCounterValue);
+        long postIncrementCounterValue = getCurrentCounterValue();
+        Assertions.assertEquals(repeats, postIncrementCounterValue);
     }
 
-    private HttpRequest createGetRequest(String url) {
-        try {
-            return HttpRequest.newBuilder()
-                    .uri(new URI(url))
-                    .GET()
-                    .build();
-        } catch (URISyntaxException e) {
-            return null;
-        }
-    }
-
-    private HttpRequest createPostRequest(String url) {
-        try {
-            return HttpRequest.newBuilder()
-                    .uri(new URI(url))
-                    .POST(HttpRequest.BodyPublishers.noBody()).build();
-        } catch (URISyntaxException e) {
-            return null;
-        }
-    }
-
-    private HttpResponse<String> getResponse(HttpRequest request) {
-        try {
-            return HttpClient.newBuilder()
-                    .build()
-                    .send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) { return null; }
-    }
-
-    private Long getCounterValueFromResponse(String response) {
-        String counterValue = response.replace("Current counter: ", "");
-        return Long.parseLong(counterValue);
-    }
 
 
 }
