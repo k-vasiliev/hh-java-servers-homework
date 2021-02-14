@@ -48,7 +48,7 @@ public class RestApp {
         if (authCookie != null && authCookie.getValue().length() >= 10) {
             counter.clear();
             return Response.ok().build();
-        } return Response.status(HttpStatus.BAD_REQUEST_400)
+        } return Response.status(HttpStatus.UNAUTHORIZED_401)
                 .entity("Missing hh-auth cookie or wrong value")
                 .build();
 

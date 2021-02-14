@@ -49,7 +49,7 @@ public class JerseyAppTest extends BaseTest {
 
         HttpRequest clearCounterRequest = createPostRequest("http://localhost:8081/counter/clear");
         HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
-        Assertions.assertEquals(400, clearResponse.statusCode());
+        Assertions.assertEquals(401, clearResponse.statusCode());
         Assertions.assertEquals("Missing hh-auth cookie or wrong value", clearResponse.body());
 
         long postClearCounterValue = getCurrentCounterValue();
@@ -68,7 +68,7 @@ public class JerseyAppTest extends BaseTest {
                         "Cookie", "hh-auths=longenoughvalue"
                 );
         HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
-        Assertions.assertEquals(400, clearResponse.statusCode());
+        Assertions.assertEquals(401, clearResponse.statusCode());
         Assertions.assertEquals("Missing hh-auth cookie or wrong value", clearResponse.body());
 
         long postClearCounterValue = getCurrentCounterValue();
@@ -87,7 +87,7 @@ public class JerseyAppTest extends BaseTest {
                         "Cookie", "hh-auth=tooshort"
                 );
         HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
-        Assertions.assertEquals(400, clearResponse.statusCode());
+        Assertions.assertEquals(401, clearResponse.statusCode());
         Assertions.assertEquals("Missing hh-auth cookie or wrong value", clearResponse.body());
 
         long postClearCounterValue = getCurrentCounterValue();
