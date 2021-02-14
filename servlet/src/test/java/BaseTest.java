@@ -11,8 +11,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.List;
+
 
 public class BaseTest {
 
@@ -58,13 +57,13 @@ public class BaseTest {
         return response;
     }
 
-    protected HttpRequest createPostRequestWithCookies(String url, String cookie) {
-        try {
-            return HttpRequest.newBuilder()
-                    .setHeader("Cookie", "hh-auth=something")
-                    .uri(new URI(url))
-                    .POST(HttpRequest.BodyPublishers.noBody()).build();
-        } catch (URISyntaxException e) { return null; }
+    protected void clearCounterWithPostRequest() {
+        HttpRequest clearCounterRequest =
+                createPostRequestWithHeader(
+                        "http://localhost:8081/counter/clear",
+                        "Cookie", "hh-auth=longenoughvalue"
+                );
+        HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
     }
 
     protected HttpRequest createGetRequest(String url) {
@@ -81,6 +80,24 @@ public class BaseTest {
             return HttpRequest.newBuilder()
                     .uri(new URI(url))
                     .POST(HttpRequest.BodyPublishers.noBody()).build();
+        } catch (URISyntaxException e) { return null; }
+    }
+
+    protected HttpRequest createPostRequestWithHeader(String url, String headerName, String headerValue) {
+        try {
+            return HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .header(headerName, headerValue)
+                    .POST(HttpRequest.BodyPublishers.noBody()).build();
+        } catch (URISyntaxException e) { return null; }
+    }
+
+    protected HttpRequest createDeleteRequestWithHeader(String url, String headerName, String headerValue) {
+        try {
+            return HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .header(headerName, headerValue)
+                    .DELETE().build();
         } catch (URISyntaxException e) { return null; }
     }
 

@@ -29,36 +29,32 @@ public class CounterServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String header = req.getHeader("Substraction-Value");
-        if (header == null) {
-            handleWrongDeleteHeader(resp);
+        Long subtractionValue = substationValue(req);
+        if (subtractionValue == null) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().print("Missing Subtraction-Value Header or wrong value");
         } else {
-            String response = parseSubstractionValueHeader(header);
-            if (response != null) {
-                resp.setStatus(HttpServletResponse.SC_OK);
-                resp.getWriter().print(response);
-            } else {
-                handleWrongDeleteHeader(resp);
-            }
+            counter.deleteDecrement(subtractionValue);
+            resp.setStatus(HttpServletResponse.SC_OK);
         }
-
     }
 
-    private void handleWrongDeleteHeader(HttpServletResponse resp) throws IOException {
-        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        resp.getWriter().print("Missing Substarction-Value Header or wrong value");
+
+    private Long substationValue(HttpServletRequest req) {
+        if (!headerIsMissing(req)) {
+            return parseHeaderValue(req.getHeader("Subtraction-Value"));
+        } return null;
     }
 
-    private String parseSubstractionValueHeader(String header) {
-        String response = null;
-        try {
-            Long decrementValue = Long.valueOf(header);
-            counter.deleteDecrement(decrementValue);
-            response = "Decrement value: " + decrementValue + ". Current counter: " + counter.getCurrentValue();
-        } catch (NumberFormatException e) {
-            System.out.println("Log: Wrong parameters again");
+    private boolean headerIsMissing(HttpServletRequest req) {
+        return req.getHeader("Subtraction-Value")  == null;
+    }
+
+    private Long parseHeaderValue(String header) {
+        try { return Long.valueOf(header); }
+        catch (NumberFormatException e) {
+            return null;
         }
-        return response;
     }
 
 }
