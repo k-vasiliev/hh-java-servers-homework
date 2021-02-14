@@ -7,12 +7,19 @@ public class EmbeddedServer {
     private Server server;
     private Counter counter = new Counter();
 
-    public Server run() throws Exception {
+    public void run() throws Exception {
         server = new Server(8081);
         ServletContextHandler context = prepareContext();
         server.setHandler(context);
         server.start();
         server.join();
+    }
+
+    public Server startServer() throws Exception {
+        server = new Server(8081);
+        ServletContextHandler context = prepareContext();
+        server.setHandler(context);
+        server.start();
         return server;
     }
 

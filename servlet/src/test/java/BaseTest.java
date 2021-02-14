@@ -1,11 +1,8 @@
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.io.IOException;
-import java.net.CookieHandler;
-import java.net.CookieManager;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -16,23 +13,11 @@ import java.net.http.HttpResponse;
 public class BaseTest {
 
     private static Server server;
-    private static Counter counter = new Counter();
 
-    private static ServletContextHandler prepareContext() {
-        ServletContextHandler context = new ServletContextHandler();
-        context.setContextPath("/");
-        context.setAttribute("counter", counter);
-        context.addServlet(CounterServlet.class, "/counter");
-        context.addServlet(ClearCounterServlet.class, "/counter/clear");
-        return context;
-    }
 
     @BeforeAll
     public static void setUp() throws Exception {
-        server = new Server(8081);
-        ServletContextHandler context = prepareContext();
-        server.setHandler(context);
-        server.start();;
+        server = new EmbeddedServer().startServer();
     }
 
     @AfterAll
@@ -55,15 +40,6 @@ public class BaseTest {
         HttpRequest request = createGetRequest("http://localhost:8081/counter");
         HttpResponse<String> response = getResponse(request);
         return response;
-    }
-
-    protected void clearCounterWithPostRequest() {
-        HttpRequest clearCounterRequest =
-                createPostRequestWithHeader(
-                        "http://localhost:8081/counter/clear",
-                        "Cookie", "hh-auth=longenoughvalue"
-                );
-        HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
     }
 
     protected HttpRequest createGetRequest(String url) {
