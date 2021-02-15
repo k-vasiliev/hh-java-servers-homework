@@ -13,8 +13,6 @@ public class JerseyAppTest extends BaseTest {
 
     private final int REPEATS = 10;
     private final int SUBTRACTION_VALUE = 6;
-    private final String BASE_URL = "http://localhost";
-    private final int PORT = 8081;
 
     @Test
     public void testInitialGetRequest() throws IOException {

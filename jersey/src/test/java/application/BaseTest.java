@@ -19,6 +19,9 @@ public class BaseTest {
     private static Server server;
     protected ObjectMapper mapper = new ObjectMapper();
 
+    protected final String BASE_URL = "http://localhost";
+    protected final int PORT = 8081;
+
     @BeforeEach
     public void setUp() throws Exception {
         server = new EmbeddedServer().createServer();
@@ -31,7 +34,7 @@ public class BaseTest {
     }
 
     protected void incrementCounterWithPostRequest() {
-        HttpRequest request = createPostRequest("http://localhost:8081/counter");
+        HttpRequest request = createPostRequest(BASE_URL + ":" + PORT + "/counter");
         executeRequest(request);
     }
 
@@ -42,7 +45,7 @@ public class BaseTest {
     }
 
     protected HttpResponse<String> getCurrentCounterResponse() {
-        HttpRequest request = createGetRequest("http://localhost:8081/counter");
+        HttpRequest request = createGetRequest(BASE_URL + ":" + PORT + "/counter");
         HttpResponse<String> response = executeRequest(request);
         return response;
     }
