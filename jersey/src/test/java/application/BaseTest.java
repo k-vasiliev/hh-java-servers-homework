@@ -3,8 +3,8 @@ package application;
 import application.serilalization.CounterResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jetty.server.Server;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,33 +19,31 @@ public class BaseTest {
     private static Server server;
     protected ObjectMapper mapper = new ObjectMapper();
 
-    @BeforeAll
-    public static void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() throws Exception {
         server = new EmbeddedServer().createServer();
         server.start();
     }
 
-    @AfterAll
-    public static void shutDown() throws Exception {
+    @AfterEach
+    public void shutDown() throws Exception {
         server.stop();
     }
 
     protected void incrementCounterWithPostRequest() {
         HttpRequest request = createPostRequest("http://localhost:8081/counter");
-        getResponse(request);
+        executeRequest(request);
     }
 
-    protected Long getCurrentCounterValue() {
+    protected Long getCurrentCounterValue() throws IOException {
         HttpResponse<String> counterResponse = getCurrentCounterResponse();
-        try {
-            CounterResponse response = mapper.readValue(counterResponse.body(), CounterResponse.class);
-            return response.getValue();
-        } catch (IOException e) { return null; }
+        CounterResponse response = mapper.readValue(counterResponse.body(), CounterResponse.class);
+        return response.getValue();
     }
 
     protected HttpResponse<String> getCurrentCounterResponse() {
         HttpRequest request = createGetRequest("http://localhost:8081/counter");
-        HttpResponse<String> response = getResponse(request);
+        HttpResponse<String> response = executeRequest(request);
         return response;
     }
 
@@ -84,14 +82,18 @@ public class BaseTest {
         } catch (URISyntaxException e) { return null; }
     }
 
-    protected HttpResponse<String> getResponse(HttpRequest request) {
+    protected HttpResponse<String> executeRequest(HttpRequest request) {
         try {
             return HttpClient.newBuilder()
                     .build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            System.out.println(e);
-            return null; }
+        } catch (IOException e) {
+            return null;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        }
+
     }
 
 }

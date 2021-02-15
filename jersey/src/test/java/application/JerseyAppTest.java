@@ -6,35 +6,31 @@ import org.junit.jupiter.api.*;
 import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class JerseyAppTest extends BaseTest {
 
-    private int REPEATS = 10;
-    private int SUBTRACTION_VALUE = 6;
+    private final int REPEATS = 10;
+    private final int SUBTRACTION_VALUE = 6;
+    private final String BASE_URL = "http://localhost";
+    private final int PORT = 8081;
 
     @Test
-    @Order(1)
-    public void testInitialGetRequest() {
+    public void testInitialGetRequest() throws IOException {
         HttpResponse<String> response = getCurrentCounterResponse();
         Assertions.assertEquals(200, response.statusCode());
-        try {
-            CounterResponse counterResponse = mapper.readValue(response.body(), CounterResponse.class);
-            Assertions.assertEquals(0L, counterResponse.getValue());
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-
+        CounterResponse counterResponse = mapper.readValue(response.body(), CounterResponse.class);
+        Assertions.assertEquals(0L, counterResponse.getValue());
     }
 
     @Test
-    @Order(2)
-    public void testInitialPostRequest() {
+    public void testInitialPostRequest() throws IOException {
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(0L, initialCounterValue);
 
-        HttpRequest request = createPostRequest("http://localhost:8081/counter");
-        HttpResponse<String> response = getResponse(request);
+        HttpRequest request = createPostRequest(BASE_URL + ":" + PORT + "/counter");
+        HttpResponse<String> response = executeRequest(request);
         Assertions.assertEquals(200, response.statusCode());
 
         long postIncrementCounterValue = getCurrentCounterValue();
@@ -42,13 +38,13 @@ public class JerseyAppTest extends BaseTest {
     }
 
     @Test
-    @Order(3)
-    public void testClearCounterRequestWithMissingCookies() {
+    public void testClearCounterRequestWithMissingCookies() throws IOException {
+        incrementCounterWithPostRequest();
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(1, initialCounterValue);
 
-        HttpRequest clearCounterRequest = createPostRequest("http://localhost:8081/counter/clear");
-        HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
+        HttpRequest clearCounterRequest = createPostRequest(BASE_URL + ":" + PORT + "/counter/clear");
+        HttpResponse<String> clearResponse = executeRequest(clearCounterRequest);
         Assertions.assertEquals(401, clearResponse.statusCode());
         Assertions.assertEquals("Missing hh-auth cookie or wrong value", clearResponse.body());
 
@@ -57,17 +53,17 @@ public class JerseyAppTest extends BaseTest {
     }
 
     @Test
-    @Order(4)
-    public void testClearCounterRequestWithWrongCookieName() {
+    public void testClearCounterRequestWithWrongCookieName() throws IOException {
+        incrementCounterWithPostRequest();
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(1, initialCounterValue);
 
         HttpRequest clearCounterRequest =
                 createPostRequestWithHeader(
-                        "http://localhost:8081/counter/clear",
+                        BASE_URL + ":" + PORT + "/counter/clear",
                         "Cookie", "hh-auths=longenoughvalue"
                 );
-        HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
+        HttpResponse<String> clearResponse = executeRequest(clearCounterRequest);
         Assertions.assertEquals(401, clearResponse.statusCode());
         Assertions.assertEquals("Missing hh-auth cookie or wrong value", clearResponse.body());
 
@@ -76,17 +72,17 @@ public class JerseyAppTest extends BaseTest {
     }
 
     @Test
-    @Order(5)
-    public void testClearCounterRequestWithWrongCookieLength() {
+    public void testClearCounterRequestWithWrongCookieLength() throws IOException {
+        incrementCounterWithPostRequest();
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(1, initialCounterValue);
 
         HttpRequest clearCounterRequest =
                 createPostRequestWithHeader(
-                        "http://localhost:8081/counter/clear",
+                        BASE_URL + ":" + PORT + "/counter/clear",
                         "Cookie", "hh-auth=tooshort"
                 );
-        HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
+        HttpResponse<String> clearResponse = executeRequest(clearCounterRequest);
         Assertions.assertEquals(401, clearResponse.statusCode());
         Assertions.assertEquals("Missing hh-auth cookie or wrong value", clearResponse.body());
 
@@ -95,17 +91,17 @@ public class JerseyAppTest extends BaseTest {
     }
 
     @Test
-    @Order(6)
-    public void testClearCounterRequestWithRightCookie() {
+    public void testClearCounterRequestWithRightCookie() throws IOException {
+        incrementCounterWithPostRequest();
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(1, initialCounterValue);
 
         HttpRequest clearCounterRequest =
                 createPostRequestWithHeader(
-                        "http://localhost:8081/counter/clear",
+                        BASE_URL + ":" + PORT + "/counter/clear",
                         "Cookie", "hh-auth=longenoughvalue"
                 );
-        HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
+        HttpResponse<String> clearResponse = executeRequest(clearCounterRequest);
         Assertions.assertEquals(200, clearResponse.statusCode());
 
         long postClearCounterValue = getCurrentCounterValue();
@@ -113,8 +109,7 @@ public class JerseyAppTest extends BaseTest {
     }
 
     @Test
-    @Order(7)
-    public void testRepeatedPostRequest() {
+    public void testRepeatedPostRequest() throws IOException {
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(0, initialCounterValue);
 
@@ -127,17 +122,21 @@ public class JerseyAppTest extends BaseTest {
     }
 
     @Test
-    @Order(8)
-    public void testDeleteRequestWithWrongHeaderName() {
+    public void testDeleteRequestWithWrongHeaderName() throws IOException {
+
+        for (int i = 0; i < REPEATS; i++) {
+            incrementCounterWithPostRequest();
+        }
+
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(REPEATS, initialCounterValue);
 
         HttpRequest deleteRequest =
                 createDeleteRequestWithHeader(
-                        "http://localhost:8081/counter",
+                        BASE_URL + ":" + PORT + "/counter",
                 "Authorization", "Token not_so_random_token"
                 );
-        HttpResponse deleteResponse = getResponse(deleteRequest);
+        HttpResponse deleteResponse = executeRequest(deleteRequest);
         Assertions.assertEquals(400, deleteResponse.statusCode());
 
         long postIncrementCounterValue = getCurrentCounterValue();
@@ -145,17 +144,21 @@ public class JerseyAppTest extends BaseTest {
     }
 
     @Test
-    @Order(9)
-    public void testDeleteRequestWithWrongHeaderValue() {
+    public void testDeleteRequestWithWrongHeaderValue() throws IOException {
+
+        for (int i = 0; i < REPEATS; i++) {
+            incrementCounterWithPostRequest();
+        }
+
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(REPEATS, initialCounterValue);
 
         HttpRequest deleteRequest =
                 createDeleteRequestWithHeader(
-                        "http://localhost:8081/counter",
+                        BASE_URL + ":" + PORT + "/counter",
                         "Subtraction-Value", "Token not_so_random_token"
                 );
-        HttpResponse deleteResponse = getResponse(deleteRequest);
+        HttpResponse deleteResponse = executeRequest(deleteRequest);
         Assertions.assertEquals(400, deleteResponse.statusCode());
 
         long postIncrementCounterValue = getCurrentCounterValue();
@@ -163,17 +166,21 @@ public class JerseyAppTest extends BaseTest {
     }
 
     @Test
-    @Order(10)
-    public void testDeleteRequestWithRightHeaderValue() {
+    public void testDeleteRequestWithRightHeaderValue() throws IOException {
+
+        for (int i = 0; i < REPEATS; i++) {
+            incrementCounterWithPostRequest();
+        }
+
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(REPEATS, initialCounterValue);
 
         HttpRequest deleteRequest =
                 createDeleteRequestWithHeader(
-                        "http://localhost:8081/counter",
+                        BASE_URL + ":" + PORT + "/counter",
                         "Subtraction-Value", String.valueOf(SUBTRACTION_VALUE)
                 );
-        HttpResponse deleteResponse = getResponse(deleteRequest);
+        HttpResponse deleteResponse = executeRequest(deleteRequest);
         Assertions.assertEquals(200, deleteResponse.statusCode());
 
         long postIncrementCounterValue = getCurrentCounterValue();
@@ -181,26 +188,7 @@ public class JerseyAppTest extends BaseTest {
     }
 
     @Test
-    @Order(11)
-    public void testCounterCantBeNegative() {
-        long initialCounterValue = getCurrentCounterValue();
-        Assertions.assertEquals(REPEATS - SUBTRACTION_VALUE, initialCounterValue);
-
-        HttpRequest deleteRequest =
-                createDeleteRequestWithHeader(
-                        "http://localhost:8081/counter",
-                        "Subtraction-Value", String.valueOf(SUBTRACTION_VALUE)
-                );
-        HttpResponse deleteResponse = getResponse(deleteRequest);
-        Assertions.assertEquals(200, deleteResponse.statusCode());
-
-        long postIncrementCounterValue = getCurrentCounterValue();
-        Assertions.assertEquals(0, postIncrementCounterValue);
-    }
-
-    @Test
-    @Order(12)
-    public void testDeleteRequestWithNegativeValue() {
+    public void testDeleteRequestWithNegativeValue() throws IOException {
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(0, initialCounterValue);
 
@@ -208,16 +196,31 @@ public class JerseyAppTest extends BaseTest {
 
         HttpRequest deleteRequest =
                 createDeleteRequestWithHeader(
-                        "http://localhost:8081/counter",
+                        BASE_URL + ":" + PORT + "/counter",
                         "Subtraction-Value", String.valueOf(negativeValue)
                 );
-        HttpResponse deleteResponse = getResponse(deleteRequest);
+        HttpResponse deleteResponse = executeRequest(deleteRequest);
         Assertions.assertEquals(200, deleteResponse.statusCode());
 
         long postIncrementCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(Math.abs(negativeValue), postIncrementCounterValue);
     }
 
+    private int testInt = 0;
 
+    private void increment() {
+        testInt++;
+    }
+
+    @Test
+    public void threadSafetyTest() throws IOException, InterruptedException {
+        ExecutorService threadPool = Executors.newFixedThreadPool(3);
+        for (int i = 0; i < 100; i++) {
+            threadPool.submit(() -> incrementCounterWithPostRequest());
+        }
+        threadPool.awaitTermination(1000, TimeUnit.MILLISECONDS);
+        long postIncrementCounterValue = getCurrentCounterValue();
+        Assertions.assertEquals(Math.abs(100), postIncrementCounterValue);
+    }
 
 }

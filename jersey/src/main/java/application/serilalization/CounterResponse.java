@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.time.LocalDateTime;
 
-@JsonPropertyOrder({"date", "value"})
 public class CounterResponse {
 
     private Long value;

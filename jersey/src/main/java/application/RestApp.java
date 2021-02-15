@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 public class RestApp {
 
     private Counter counter;
+    private final String hhAuthCookie = "hh-auth";
+    private final String subtractHeader = "Subtraction-Value";
 
     public RestApp(@Context ServletContext context) {
         counter = (Counter) context.getAttribute("counter");
@@ -32,7 +34,7 @@ public class RestApp {
 
     @DELETE
     public Response subtractCounter(@Context HttpHeaders headers) {
-        Long subtractValue = parseHeaderValue(headers.getHeaderString("Subtraction-Value"));
+        Long subtractValue = parseHeaderValue(headers.getHeaderString(subtractHeader));
         if (subtractValue != null) {
             counter.deleteDecrement(subtractValue);
             return Response.ok().build();
@@ -44,7 +46,7 @@ public class RestApp {
     @POST
     @Path(value = "/clear")
     public Response clearCounter(@Context HttpHeaders headers) {
-        Cookie authCookie = headers.getCookies().get("hh-auth");
+        Cookie authCookie = headers.getCookies().get(hhAuthCookie);
         if (authCookie != null && authCookie.getValue().length() >= 10) {
             counter.clear();
             return Response.ok().build();
