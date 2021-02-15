@@ -1,16 +1,19 @@
 import org.junit.jupiter.api.*;
 
+import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CounterServletTest extends BaseTest {
 
-    private int REPEATS = 10;
-    private int SUBSTRACTION_VALUE = 6;
+    private static final int REPEATS = 10;
+    private static final int SUBTRACTION_VALUE = 6;
 
     @Test
-    @Order(1)
     public void testInitialGetRequest() {
         HttpResponse<String> response = getCurrentCounterResponse();
         Assertions.assertEquals(200, response.statusCode());
@@ -19,13 +22,12 @@ public class CounterServletTest extends BaseTest {
     }
 
     @Test
-    @Order(2)
     public void testInitialPostRequest() {
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(0L, initialCounterValue);
 
-        HttpRequest request = createPostRequest("http://localhost:8081/counter");
-        HttpResponse<String> response = getResponse(request);
+        HttpRequest request = createPostRequest(BASE_URL + ":" + PORT + "/counter");
+        HttpResponse<String> response = executeRequest(request);
         Assertions.assertEquals(200, response.statusCode());
 
         long postIncrementCounterValue = getCurrentCounterValue();
@@ -33,14 +35,14 @@ public class CounterServletTest extends BaseTest {
     }
 
     @Test
-    @Order(3)
     public void testClearCounterRequestWithMissingCookies() {
+        incrementCounterWithPostRequest();
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(1, initialCounterValue);
 
-        HttpRequest clearCounterRequest = createPostRequest("http://localhost:8081/counter/clear");
-        HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
-        Assertions.assertEquals(400, clearResponse.statusCode());
+        HttpRequest clearCounterRequest = createPostRequest(BASE_URL + ":" + PORT + "/counter/clear");
+        HttpResponse<String> clearResponse = executeRequest(clearCounterRequest);
+        Assertions.assertEquals(401, clearResponse.statusCode());
         Assertions.assertEquals("Missing hh-auth cookie or wrong value", clearResponse.body());
 
         long postClearCounterValue = getCurrentCounterValue();
@@ -48,18 +50,18 @@ public class CounterServletTest extends BaseTest {
     }
 
     @Test
-    @Order(4)
     public void testClearCounterRequestWithWrongCookieName() {
+        incrementCounterWithPostRequest();
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(1, initialCounterValue);
 
         HttpRequest clearCounterRequest =
                 createPostRequestWithHeader(
-                        "http://localhost:8081/counter/clear",
+                        BASE_URL + ":" + PORT + "/counter/clear",
                         "Cookie", "hh-auths=longenoughvalue"
                 );
-        HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
-        Assertions.assertEquals(400, clearResponse.statusCode());
+        HttpResponse<String> clearResponse = executeRequest(clearCounterRequest);
+        Assertions.assertEquals(401, clearResponse.statusCode());
         Assertions.assertEquals("Missing hh-auth cookie or wrong value", clearResponse.body());
 
         long postClearCounterValue = getCurrentCounterValue();
@@ -67,18 +69,18 @@ public class CounterServletTest extends BaseTest {
     }
 
     @Test
-    @Order(5)
     public void testClearCounterRequestWithWrongCookieLength() {
+        incrementCounterWithPostRequest();
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(1, initialCounterValue);
 
         HttpRequest clearCounterRequest =
                 createPostRequestWithHeader(
-                        "http://localhost:8081/counter/clear",
+                        BASE_URL + ":" + PORT + "/counter/clear",
                         "Cookie", "hh-auth=tooshort"
                 );
-        HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
-        Assertions.assertEquals(400, clearResponse.statusCode());
+        HttpResponse<String> clearResponse = executeRequest(clearCounterRequest);
+        Assertions.assertEquals(401, clearResponse.statusCode());
         Assertions.assertEquals("Missing hh-auth cookie or wrong value", clearResponse.body());
 
         long postClearCounterValue = getCurrentCounterValue();
@@ -86,17 +88,17 @@ public class CounterServletTest extends BaseTest {
     }
 
     @Test
-    @Order(6)
     public void testClearCounterRequestWithRightCookie() {
+        incrementCounterWithPostRequest();
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(1, initialCounterValue);
 
         HttpRequest clearCounterRequest =
                 createPostRequestWithHeader(
-                        "http://localhost:8081/counter/clear",
+                        BASE_URL + ":" + PORT + "/counter/clear",
                         "Cookie", "hh-auth=longenoughvalue"
                 );
-        HttpResponse<String> clearResponse = getResponse(clearCounterRequest);
+        HttpResponse<String> clearResponse = executeRequest(clearCounterRequest);
         Assertions.assertEquals(200, clearResponse.statusCode());
 
         long postClearCounterValue = getCurrentCounterValue();
@@ -104,7 +106,6 @@ public class CounterServletTest extends BaseTest {
     }
 
     @Test
-    @Order(7)
     public void testRepeatedPostRequest() {
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(0, initialCounterValue);
@@ -118,17 +119,21 @@ public class CounterServletTest extends BaseTest {
     }
 
     @Test
-    @Order(8)
     public void testDeleteRequestWithWrongHeaderName() {
+
+        for (int i = 0; i < REPEATS; i++) {
+            incrementCounterWithPostRequest();
+        }
+
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(REPEATS, initialCounterValue);
 
         HttpRequest deleteRequest =
                 createDeleteRequestWithHeader(
-                        "http://localhost:8081/counter",
+                        BASE_URL + ":" + PORT + "/counter",
                 "Authorization", "Token not_so_random_token"
                 );
-        HttpResponse deleteResponse = getResponse(deleteRequest);
+        HttpResponse deleteResponse = executeRequest(deleteRequest);
         Assertions.assertEquals(400, deleteResponse.statusCode());
 
         long postIncrementCounterValue = getCurrentCounterValue();
@@ -136,17 +141,21 @@ public class CounterServletTest extends BaseTest {
     }
 
     @Test
-    @Order(9)
     public void testDeleteRequestWithWrongHeaderValue() {
+
+        for (int i = 0; i < REPEATS; i++) {
+            incrementCounterWithPostRequest();
+        }
+
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(REPEATS, initialCounterValue);
 
         HttpRequest deleteRequest =
                 createDeleteRequestWithHeader(
-                        "http://localhost:8081/counter",
+                        BASE_URL + ":" + PORT + "/counter",
                         "Subtraction-Value", "Token not_so_random_token"
                 );
-        HttpResponse deleteResponse = getResponse(deleteRequest);
+        HttpResponse deleteResponse = executeRequest(deleteRequest);
         Assertions.assertEquals(400, deleteResponse.statusCode());
 
         long postIncrementCounterValue = getCurrentCounterValue();
@@ -154,43 +163,28 @@ public class CounterServletTest extends BaseTest {
     }
 
     @Test
-    @Order(10)
     public void testDeleteRequestWithRightHeaderValue() {
+
+        for (int i = 0; i < REPEATS; i++) {
+            incrementCounterWithPostRequest();
+        }
+
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(REPEATS, initialCounterValue);
 
         HttpRequest deleteRequest =
                 createDeleteRequestWithHeader(
-                        "http://localhost:8081/counter",
-                        "Subtraction-Value", String.valueOf(SUBSTRACTION_VALUE)
+                        BASE_URL + ":" + PORT + "/counter",
+                        "Subtraction-Value", String.valueOf(SUBTRACTION_VALUE)
                 );
-        HttpResponse deleteResponse = getResponse(deleteRequest);
+        HttpResponse deleteResponse = executeRequest(deleteRequest);
         Assertions.assertEquals(200, deleteResponse.statusCode());
 
         long postIncrementCounterValue = getCurrentCounterValue();
-        Assertions.assertEquals(REPEATS - SUBSTRACTION_VALUE, postIncrementCounterValue);
+        Assertions.assertEquals(REPEATS - SUBTRACTION_VALUE, postIncrementCounterValue);
     }
 
     @Test
-    @Order(11)
-    public void testCounterCantBeNegative() {
-        long initialCounterValue = getCurrentCounterValue();
-        Assertions.assertEquals(REPEATS - SUBSTRACTION_VALUE, initialCounterValue);
-
-        HttpRequest deleteRequest =
-                createDeleteRequestWithHeader(
-                        "http://localhost:8081/counter",
-                        "Subtraction-Value", String.valueOf(SUBSTRACTION_VALUE)
-                );
-        HttpResponse deleteResponse = getResponse(deleteRequest);
-        Assertions.assertEquals(200, deleteResponse.statusCode());
-
-        long postIncrementCounterValue = getCurrentCounterValue();
-        Assertions.assertEquals(0, postIncrementCounterValue);
-    }
-
-    @Test
-    @Order(12)
     public void testDeleteRequestWithNegativeValue() {
         long initialCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(0, initialCounterValue);
@@ -199,14 +193,25 @@ public class CounterServletTest extends BaseTest {
 
         HttpRequest deleteRequest =
                 createDeleteRequestWithHeader(
-                        "http://localhost:8081/counter",
+                        BASE_URL + ":" + PORT + "/counter",
                         "Subtraction-Value", String.valueOf(negativeValue)
                 );
-        HttpResponse deleteResponse = getResponse(deleteRequest);
+        HttpResponse deleteResponse = executeRequest(deleteRequest);
         Assertions.assertEquals(200, deleteResponse.statusCode());
 
         long postIncrementCounterValue = getCurrentCounterValue();
         Assertions.assertEquals(Math.abs(negativeValue), postIncrementCounterValue);
+    }
+
+    @Test
+    public void threadSafetyTest() throws IOException, InterruptedException {
+        ExecutorService threadPool = Executors.newFixedThreadPool(3);
+        for (int i = 0; i < 100; i++) {
+            threadPool.submit(() -> incrementCounterWithPostRequest());
+        }
+        threadPool.awaitTermination(1000, TimeUnit.MILLISECONDS);
+        long postIncrementCounterValue = getCurrentCounterValue();
+        Assertions.assertEquals(Math.abs(100), postIncrementCounterValue);
     }
 
 

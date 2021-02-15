@@ -8,6 +8,7 @@ import java.io.IOException;
 public class CounterServlet extends HttpServlet {
 
     private Counter counter;
+    private final String subtractHeader = "Subtraction-Value";
 
     @Override
     public void init() throws ServletException {
@@ -17,14 +18,14 @@ public class CounterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setStatus(HttpServletResponse.SC_OK);
-        resp.getWriter().print(counter.getCurrentValue());
+        resp.getWriter().print(counter.getValue());
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setStatus(HttpServletResponse.SC_OK);
         counter.postIncrement();
-        resp.getWriter().print(counter.getCurrentValue());
+        resp.getWriter().print(counter.getValue());
     }
 
     @Override
@@ -42,12 +43,12 @@ public class CounterServlet extends HttpServlet {
 
     private Long substationValue(HttpServletRequest req) {
         if (!headerIsMissing(req)) {
-            return parseHeaderValue(req.getHeader("Subtraction-Value"));
+            return parseHeaderValue(req.getHeader(subtractHeader));
         } return null;
     }
 
     private boolean headerIsMissing(HttpServletRequest req) {
-        return req.getHeader("Subtraction-Value")  == null;
+        return req.getHeader(subtractHeader)  == null;
     }
 
     private Long parseHeaderValue(String header) {

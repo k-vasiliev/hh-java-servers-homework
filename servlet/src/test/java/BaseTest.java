@@ -1,6 +1,6 @@
 import org.eclipse.jetty.server.Server;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,21 +13,22 @@ import java.net.http.HttpResponse;
 public class BaseTest {
 
     private static Server server;
+    protected final String BASE_URL = "http://localhost";
+    protected final int PORT = 8081;
 
-
-    @BeforeAll
-    public static void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() throws Exception {
         server = new EmbeddedServer().startServer();
     }
 
-    @AfterAll
-    public static void shutDown() throws Exception {
+    @AfterEach
+    public void shutDown() throws Exception {
         server.stop();
     }
 
     protected void incrementCounterWithPostRequest() {
-        HttpRequest request = createPostRequest("http://localhost:8081/counter");
-        getResponse(request);
+        HttpRequest request = createPostRequest(BASE_URL + ":" + PORT + "/counter");
+        executeRequest(request);
     }
 
     protected long getCurrentCounterValue() {
@@ -37,8 +38,8 @@ public class BaseTest {
     }
 
     protected HttpResponse<String> getCurrentCounterResponse() {
-        HttpRequest request = createGetRequest("http://localhost:8081/counter");
-        HttpResponse<String> response = getResponse(request);
+        HttpRequest request = createGetRequest(BASE_URL + ":" + PORT + "/counter");
+        HttpResponse<String> response = executeRequest(request);
         return response;
     }
 
@@ -77,14 +78,17 @@ public class BaseTest {
         } catch (URISyntaxException e) { return null; }
     }
 
-    protected HttpResponse<String> getResponse(HttpRequest request) {
+    protected HttpResponse<String> executeRequest(HttpRequest request) {
         try {
             return HttpClient.newBuilder()
                     .build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            System.out.println(e);
-            return null; }
+        } catch (IOException e) {
+            return null;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        }
     }
 
 }

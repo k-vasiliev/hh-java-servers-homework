@@ -1,32 +1,26 @@
+import java.util.concurrent.atomic.AtomicLong;
+
 public class Counter {
 
-    private Long value = 0L;
+    private AtomicLong value = new AtomicLong(0);
 
     public Counter() {}
 
-    public Counter(Long initialValue) {
-        value = initialValue;
-    }
-
     public Long postIncrement() {
-        value+=1;
-        return value;
+        return value.incrementAndGet();
     }
 
     public Long deleteDecrement(Long decrementValue) {
-        value = (value >= decrementValue)
-                ? value - decrementValue
-                : 0;
-        return value;
+        return value.addAndGet(-decrementValue);
     }
 
     public Long clear() {
-        value = 0L;
-        return value;
+        value.set(0);
+        return value.get();
     }
 
-    public Long getCurrentValue() {
-        return value;
+    public Long getValue() {
+        return value.get();
     }
 
 }
