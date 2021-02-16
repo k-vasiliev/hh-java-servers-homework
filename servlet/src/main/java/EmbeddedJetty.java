@@ -1,21 +1,20 @@
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHandler;
 
 public class EmbeddedJetty {
 
-    private static Server createServer() {
-        Server server = new Server(8080);
-        ServletContextHandler servletContextHandler = new ServletContextHandler();
-        servletContextHandler.setAttribute("count", new Count());
-        servletContextHandler.setContextPath("/");
-        servletContextHandler.addServlet(ServletCounter.class, "/counter");
-        servletContextHandler.addServlet(ServletCounterClear.class, "/counter/clear");
-        server.setHandler(servletContextHandler);
+    private static Server createServer(int port) {
+        Server server = new Server(port);
+        ServletHandler servlethandler = new ServletHandler();
+        servlethandler.addServletWithMapping(ServletCounter.class, "/counter");
+        servlethandler.addServletWithMapping(ServletCounterClear.class, "/counter/clear");
+        server.setHandler(servlethandler);
         return server;
     }
 
     public static void main(String[] args) throws Exception {
-        Server server = createServer();
+        int port = 8080;
+        Server server = createServer(port);
         server.start();
         server.join();
     }

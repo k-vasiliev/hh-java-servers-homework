@@ -8,44 +8,39 @@ import java.io.PrintWriter;
 
 @WebServlet(urlPatterns = "/counter")
 public class ServletCounter extends HttpServlet {
-
-    private Count count;
-
-    @Override
-    public void init() throws ServletException {
-        this.count = (Count) getServletContext().getAttribute("count");
-    }
-
     final String SUBTRACTION_HEADER = "Subtraction-Value";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        PrintWriter writer = resp.getWriter();
-        writer.print(count.getValue());
-        writer.flush();
         resp.setStatus(HttpServletResponse.SC_OK);
+        PrintWriter writer = resp.getWriter();
+        writer.print(Count.getValue());
+        writer.flush();
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        count.inc();
-        PrintWriter writer = resp.getWriter();
-        writer.print(count.getValue());
-        writer.flush();
+        Count.inc();
         resp.setStatus(HttpServletResponse.SC_OK);
+        PrintWriter writer = resp.getWriter();
+        writer.print(Count.getValue());
+        writer.flush();
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        int reducer = 0;
+        int subtrahend = 0;
         try {
-            reducer = Integer.parseInt(req.getHeader(SUBTRACTION_HEADER));
+            subtrahend = Integer.parseInt(req.getHeader(SUBTRACTION_HEADER));
         } catch (NumberFormatException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-        count.setValue(count.getValue() - reducer);
+        Count.subtract(subtrahend);
         resp.setStatus(HttpServletResponse.SC_OK);
+        PrintWriter writer = resp.getWriter();
+        writer.print(Count.getValue());
+        writer.flush();
     }
 }

@@ -1,23 +1,21 @@
-public class Count {
+import java.util.concurrent.atomic.AtomicInteger;
 
-    private int value = 0;
+public final class Count {
+    private final static AtomicInteger value = new AtomicInteger(0);
 
-    public Count() {
+    public static Integer getValue() {
+        return value.intValue();
     }
 
-    public int getValue() {
-        return value;
+    public static void setValue(Integer newValue) {
+        value.set(newValue);
     }
 
-    public void setValue(int v) {
-        this.value = v;
+    public static void inc() {
+        value.incrementAndGet();
     }
 
-    public void inc() {
-        this.value++;
-    }
-
-    public void dec() {
-        this.value--;
+    public static void subtract(Integer sub) {
+        value.addAndGet(-sub);
     }
 }
