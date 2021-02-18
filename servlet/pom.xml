@@ -7,7 +7,15 @@
     <groupId>ru.hh</groupId>
     <artifactId>servlet-homework</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>${jettyVersion}</version>
+        </dependency>
+    </dependencies>
     <properties>
         <jettyVersion>9.4.25.v20191220</jettyVersion>
         <maven.compiler.target>11</maven.compiler.target>
