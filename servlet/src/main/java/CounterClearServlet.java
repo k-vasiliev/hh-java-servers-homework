@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public class CounterClearServlet extends HttpServlet {
 
+    public static final String AUTH_COOKIE_NAME = "hh-auth";
+
     private Counter counter;
 
     @Override
@@ -34,7 +36,7 @@ public class CounterClearServlet extends HttpServlet {
             return false;
 
         Optional<Cookie> auth = Arrays.stream(cookies)
-            .filter((cookie) -> cookie.getName().equals("hh-auth") && cookie.getValue().length() > 10)
+            .filter((cookie) -> cookie.getName().equals(AUTH_COOKIE_NAME) && cookie.getValue().length() > 10)
             .findAny();
 
         return auth.isPresent();

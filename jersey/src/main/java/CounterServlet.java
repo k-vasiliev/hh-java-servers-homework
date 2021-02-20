@@ -20,6 +20,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Path("/counter")
 public class CounterServlet {
 
+    public static final String SUBTRUCTION_VALUE_HEADER_NAME = "Subtraction-Value";
+
+    public static final String AUTH_COOKIE_NAME = "hh-auth";
+
     private Counter counter;
 
     private Clock clock;
@@ -45,7 +49,7 @@ public class CounterServlet {
     }
 
     @DELETE
-    public Response subtractFromCounter(@HeaderParam("Subtraction-Value") Integer subtractionValue) {
+    public Response subtractFromCounter(@HeaderParam(SUBTRUCTION_VALUE_HEADER_NAME) Integer subtractionValue) {
         if (subtractionValue == null)
             return Response.status(Status.BAD_REQUEST).entity("Bad Subtraction Value\n").build();
 
@@ -55,7 +59,7 @@ public class CounterServlet {
 
     @POST
     @Path("/clear")
-    public Response clearCounter(@CookieParam("hh-auth") String auth) {
+    public Response clearCounter(@CookieParam(AUTH_COOKIE_NAME) String auth) {
         if (auth != null && auth.length() > 10) {
             counter.set(0);
             return Response.ok().build();

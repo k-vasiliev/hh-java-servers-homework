@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public class CounterServlet extends HttpServlet {
 
+    public static final String SUBTRUCTION_VALUE_HEADER_NAME = "Subtraction-Value";
+
     private Counter counter;
 
     @Override
@@ -29,7 +31,7 @@ public class CounterServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            counter.subtract(Integer.parseInt(req.getHeader("Subtraction-Value")));
+            counter.subtract(Integer.parseInt(req.getHeader(SUBTRUCTION_VALUE_HEADER_NAME)));
             resp.setStatus(HttpServletResponse.SC_OK);
         }
         catch (NumberFormatException e) {
