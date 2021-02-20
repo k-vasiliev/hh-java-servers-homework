@@ -18,13 +18,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Path("/counter")
-public class CounterServletContainer {
+public class CounterServlet {
 
     private Counter counter;
 
     private Clock clock;
 
-    public CounterServletContainer(@Context ServletContext context) {
+    public CounterServlet(@Context ServletContext context) {
         counter = (Counter) context.getAttribute("counter");
         clock = (Clock) context.getAttribute("clock");
     }

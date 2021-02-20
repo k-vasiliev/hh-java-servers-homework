@@ -8,7 +8,7 @@ public class CounterServiceConfig extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<>();
-        classes.add(CounterServletContainer.class);
+        classes.add(CounterServlet.class);
         return classes;
     }
 }
