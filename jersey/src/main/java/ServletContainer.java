@@ -1,8 +1,9 @@
-package service;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.w3c.dom.css.Counter;
+import service.CounterService;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
@@ -12,15 +13,15 @@ import java.time.format.DateTimeFormatter;
 @Path("/counter")
 public class ServletContainer {
 
-    private int count;
+    private CounterService service;
 
-    private ServletContainer() { count = 0; }
+    public ServletContainer() { this.service = CounterService.getInstance(); }
 
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     public String incrementByOne(@CookieParam("hh-auth") String cookie) {
         if (cookie != null && cookie.length() > 10) {
-            count++;
+            service.incrementByOne();
             return "Counter incremented by 1";
         }
         return "Cookie is required";
@@ -32,7 +33,7 @@ public class ServletContainer {
         if (n == null) {
             return "Decrement required";
         }
-        count -= n;
+        service.decrementByN(n);
         return "Decremented by " + n;
     }
 
@@ -40,7 +41,7 @@ public class ServletContainer {
     @Produces(MediaType.TEXT_PLAIN)
     public String reset(@CookieParam("hh-auth") String cookie) {
         if (cookie.length() > 10) {
-            setCount(0);
+            service.reset();
             return "Successfully reset";
         }
         return "Cookie required";
@@ -55,16 +56,7 @@ public class ServletContainer {
         OffsetDateTime now = OffsetDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
         node.put("date", formatter.format(now));
-        node.put("value", count);
+        node.put("value", service.getCount());
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
     }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
 }
