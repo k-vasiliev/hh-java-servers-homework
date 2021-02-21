@@ -5,12 +5,11 @@ public class CounterService {
 
     private static CounterService instance;
 
-    private CounterService() {}
+    private CounterService() { this.count = 0; }
 
     public static CounterService getInstance() {
         if (instance == null) {
             instance = new CounterService();
-            instance.setCount(0);
         }
         return instance;
     }

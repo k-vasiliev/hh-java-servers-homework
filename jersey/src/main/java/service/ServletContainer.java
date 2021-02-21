@@ -11,18 +11,10 @@ import java.time.format.DateTimeFormatter;
 
 @Path("/counter")
 public class ServletContainer {
-    private static ServletContainer instance;
 
     private int count;
 
     private ServletContainer() { count = 0; }
-
-    public static ServletContainer getInstance() {
-        if (instance == null) {
-            instance = new ServletContainer();
-        }
-        return instance;
-    }
 
     @POST
     @Produces(MediaType.TEXT_PLAIN)
@@ -36,16 +28,22 @@ public class ServletContainer {
 
     @DELETE
     @Produces(MediaType.TEXT_PLAIN)
-    public String decrementByN(@QueryParam("subtraction") int n) {
+    public String decrementByN(@QueryParam("subtraction") Integer n) {
+        if (n == null) {
+            return "Decrement required";
+        }
         count -= n;
         return "Decremented by " + n;
     }
 
     @Path("/clear")
     @Produces(MediaType.TEXT_PLAIN)
-    public String reset() {
-        setCount(0);
-        return "Successfully reset";
+    public String reset(@CookieParam("hh-auth") String cookie) {
+        if (cookie.length() > 10) {
+            setCount(0);
+            return "Successfully reset";
+        }
+        return "Cookie required";
     }
 
     @GET

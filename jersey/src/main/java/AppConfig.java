@@ -6,10 +6,10 @@ import java.util.Set;
 
 public class AppConfig extends Application {
     @Override
-    public Set<Object> getSingletons()
+    public Set<Class<?>> getClasses()
     {
-        Set<Object> s = new HashSet<>();
-        s.add(ServletContainer.getInstance());
+        Set<Class<?>> s = new HashSet<>();
+        s.add(ServletContainer.class);
         return s;
     }
 }

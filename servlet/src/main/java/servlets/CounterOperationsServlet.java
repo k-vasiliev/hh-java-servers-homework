@@ -17,7 +17,7 @@ public class CounterOperationsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int count = service.getCount();
         response.setContentType("text/html;charset=utf-8");
-        response.getWriter().println("Current value of counter is " + count);
+        response.getWriter().println(count);
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
