@@ -1,6 +1,11 @@
 public class ServletApplication {
 
-  public static void main(String[] args) {
-    // run, Jetty, run!
+  public ServletApplication() {
+  }
+
+  public static void main(String[] args) throws Exception {
+    CounterServer server = new CounterServer(8081);
+    server.start();
+    server.join();
   }
 }
