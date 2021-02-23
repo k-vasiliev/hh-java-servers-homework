@@ -3,9 +3,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MediaType;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.time.LocalDateTime;
 
 @Path("/counter")
@@ -14,22 +11,14 @@ public class ServletCounter {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCount() {
-        return Response
-                .ok(new ObjectMapper().createObjectNode()
-                        .put("date", LocalDateTime.now().toString())
-                        .put("value", Count.getValue()))
-                .build();
+        return getCounterDtoSuccess();
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response incCounter() {
         Count.inc();
-        return Response
-                .ok(new ObjectMapper().createObjectNode()
-                        .put("date", LocalDateTime.now().toString())
-                        .put("value", Count.getValue()))
-                .build();
+        return getCounterDtoSuccess();
     }
 
     @DELETE
@@ -38,17 +27,12 @@ public class ServletCounter {
         if (value == null) {
             return Response
                     .status(HttpServletResponse.SC_BAD_REQUEST)
-                    .entity(new ObjectMapper().createObjectNode()
-                            .put("error", "subtraction value is empty"))
+                    .entity(new CounterDto("subtraction value is empty"))
                     .build();
         }
 
         Count.subtract(value);
-        return Response
-                .ok(new ObjectMapper().createObjectNode()
-                        .put("date", LocalDateTime.now().toString())
-                        .put("value", Count.getValue()))
-                .build();
+        return getCounterDtoSuccess();
     }
 
     @POST
@@ -59,16 +43,17 @@ public class ServletCounter {
         if (value == null || value.length() < 10) {
             return Response
                     .status(HttpServletResponse.SC_UNAUTHORIZED)
-                    .entity(new ObjectMapper().createObjectNode()
-                            .put("error", "auth cookies is invalid"))
+                    .entity(new CounterDto("auth cookies is invalid"))
                     .build();
         }
 
         Count.setValue(0);
+        return getCounterDtoSuccess();
+    }
+
+    private Response getCounterDtoSuccess() {
         return Response
-                .ok(new ObjectMapper().createObjectNode()
-                        .put("date", LocalDateTime.now().toString())
-                        .put("value", Count.getValue()))
+                .ok(new CounterDto(Count.getValue(), LocalDateTime.now().toString()))
                 .build();
     }
 }
