@@ -8,6 +8,13 @@ import java.time.LocalDateTime;
 @Path("/counter")
 public class ServletCounter {
 
+    private static final String HEADER_SUBTRACTION_VALUE = "Subtraction-Value";
+    private static final String ERR_EMPTY_SUBTRACTION_VALUE = "subtraction value is empty";
+
+    private static final String COOKIE_PARAM_HH_AUTH = "hh-auth";
+    private static final int MAX_HH_AUTH_LENGTH = 10;
+    private static final String ERR_HH_AUTH_INVALID = "auth cookies is invalid";
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCount() {
@@ -23,11 +30,11 @@ public class ServletCounter {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public Response subtractCounter(@HeaderParam("Subtraction-Value") Integer value) {
+    public Response subtractCounter(@HeaderParam(HEADER_SUBTRACTION_VALUE) Integer value) {
         if (value == null) {
             return Response
                     .status(HttpServletResponse.SC_BAD_REQUEST)
-                    .entity(new CounterDto("subtraction value is empty"))
+                    .entity(new CounterDto(ERR_EMPTY_SUBTRACTION_VALUE))
                     .build();
         }
 
@@ -38,12 +45,12 @@ public class ServletCounter {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/clear")
-    public Response clearCounter(@CookieParam("hh-auth") String value) {
+    public Response clearCounter(@CookieParam(COOKIE_PARAM_HH_AUTH) String value) {
 
-        if (value == null || value.length() < 10) {
+        if (value == null || value.length() < MAX_HH_AUTH_LENGTH) {
             return Response
                     .status(HttpServletResponse.SC_UNAUTHORIZED)
-                    .entity(new CounterDto("auth cookies is invalid"))
+                    .entity(new CounterDto(ERR_HH_AUTH_INVALID))
                     .build();
         }
 
