@@ -13,7 +13,7 @@ public class CounterClearServlet extends HttpServlet {
             counter.resetCounter();
             resp.setStatus(HttpServletResponse.SC_OK);
         } else {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 
