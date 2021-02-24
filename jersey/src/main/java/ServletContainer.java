@@ -1,62 +1,63 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.w3c.dom.css.Counter;
 import service.CounterService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-
+import javax.ws.rs.core.Response;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Path("/counter")
 public class ServletContainer {
 
-    private CounterService service;
+    private final CounterService service;
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    public ServletContainer() { this.service = CounterService.getInstance(); }
+
+    public ServletContainer() {
+        this.service = CounterService.getInstance();
+    }
 
     @POST
     @Produces(MediaType.TEXT_PLAIN)
-    public String incrementByOne(@CookieParam("hh-auth") String cookie) {
-        if (cookie != null && cookie.length() > 10) {
-            service.incrementByOne();
-            return "Counter incremented by 1";
-        }
-        return "Cookie is required";
+    public Response incrementByOne() {
+        service.incrementByOne();
+        return Response.ok("Counter incremented by 1").build();
     }
 
     @DELETE
     @Produces(MediaType.TEXT_PLAIN)
-    public String decrementByN(@QueryParam("subtraction") Integer n) {
+    public Response decrementByN(@QueryParam("subtraction") Integer n) {
         if (n == null) {
-            return "Decrement required";
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
         service.decrementByN(n);
-        return "Decremented by " + n;
+        return Response.ok("Successfully incremented").build();
     }
 
-    @Path("/clear")
+    @POST
+    @Path(value = "/clear")
     @Produces(MediaType.TEXT_PLAIN)
-    public String reset(@CookieParam("hh-auth") String cookie) {
-        if (cookie.length() > 10) {
+    public Response reset(@CookieParam("hh-auth") String cookie) {
+        if (cookie != null && cookie.length() > 10) {
             service.reset();
-            return "Successfully reset";
+            return Response.ok("Successfully reset").build();
         }
-        return "Cookie required";
+        return Response.status(Response.Status.UNAUTHORIZED).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getCounter() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+    public Response getCounter() throws JsonProcessingException {
         ObjectNode node = mapper.createObjectNode();
 
         OffsetDateTime now = OffsetDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
         node.put("date", formatter.format(now));
         node.put("value", service.getCount());
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        return Response.ok(json).build();
     }
 }
