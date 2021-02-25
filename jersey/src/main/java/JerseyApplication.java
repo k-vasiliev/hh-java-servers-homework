@@ -3,7 +3,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-public class EmbeddedJetty {
+public class JerseyApplication {
 
     private static Server createServer(int port) {
         Server server = new Server(port);

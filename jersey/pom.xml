@@ -92,7 +92,7 @@
                     <execution><goals><goal>java</goal></goals></execution>
                 </executions>
                 <configuration>
-                    <mainClass>EmbeddedJetty</mainClass>
+                    <mainClass>JerseyApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
