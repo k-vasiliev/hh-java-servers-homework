@@ -1,10 +1,10 @@
 package dao;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 public class CounterDao {
   private final static CounterDao instance = new CounterDao();
-  private final AtomicLong count = new AtomicLong(0L);
+  private final LongAdder count = new LongAdder();
 
   private CounterDao() {
   }
@@ -14,7 +14,7 @@ public class CounterDao {
   }
 
   public void clear() {
-    count.set(0L);
+    count.reset();
   }
 
   public long get() {
@@ -22,10 +22,10 @@ public class CounterDao {
   }
 
   public void increment() {
-    count.incrementAndGet();
+    count.increment();
   }
 
   public synchronized void decrement(long delta) {
-    count.addAndGet(-delta);
+    count.add(-delta);
   }
 }
