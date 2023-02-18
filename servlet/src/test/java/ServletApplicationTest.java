@@ -1,8 +1,4 @@
 import io.netty.handler.codec.http.cookie.DefaultCookie;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 import org.asynchttpclient.Response;
@@ -10,12 +6,16 @@ import org.asynchttpclient.cookie.CookieStore;
 import org.asynchttpclient.uri.Uri;
 import org.awaitility.Awaitility;
 import org.hamcrest.core.IsEqual;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ServletApplicationTest {
 
@@ -58,7 +58,7 @@ public class ServletApplicationTest {
     increaseCounter().get();
 
     Response response = decreaseCounter(2).get();
-    assertTrue(isStatusCodeOk(response),  "Server response is not ok");
+    assertTrue(isStatusCodeOk(response), "Server response is not ok");
 
     int counterValue = getCounterValue();
     assertEquals(initCounterValue + 3 - 2, counterValue, "Subtraction is not works properly");

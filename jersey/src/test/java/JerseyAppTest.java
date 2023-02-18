@@ -1,13 +1,6 @@
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.cookie.DefaultCookie;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 import org.asynchttpclient.Response;
@@ -15,13 +8,19 @@ import org.asynchttpclient.cookie.CookieStore;
 import org.asynchttpclient.uri.Uri;
 import org.awaitility.Awaitility;
 import org.hamcrest.core.IsEqual;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JerseyAppTest {
 
@@ -65,7 +64,7 @@ public class JerseyAppTest {
     increaseCounter().get();
 
     Response response = decreaseCounter(2).get();
-    assertTrue(isStatusCodeOk(response),  "Server response is not ok");
+    assertTrue(isStatusCodeOk(response), "Server response is not ok");
 
     int counterValue = getCounterValue();
     assertEquals(initCounterValue + 3 - 2, counterValue, "Subtraction is not works properly");
