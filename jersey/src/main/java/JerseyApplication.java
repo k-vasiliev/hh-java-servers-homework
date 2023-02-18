@@ -1,7 +1,9 @@
+import config.JerseyApplicationConfig;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.glassfish.jersey.servlet.ServletProperties;
 
 public class JerseyApplication {
   private final static int PORT = 8081;
@@ -14,12 +16,16 @@ public class JerseyApplication {
 
   private static Server createServer(int port) {
     Server server = new Server(port);
-    ServletContextHandler servletContextHandler = new ServletContextHandler();
 
-    server.setHandler(servletContextHandler);
-    ServletHolder servletHolder = servletContextHandler.addServlet(ServletContainer.class, "/*");
-    servletHolder.setInitOrder(1);
-    servletHolder.setInitParameter("javax.ws.rs.core.Application", "resource");
+    ServletContextHandler ctx = new ServletContextHandler();
+
+    server.setHandler(ctx);
+
+    ServletHolder servletHolder = ctx.addServlet(ServletContainer.class, "/*");
+    servletHolder.setInitParameter(
+        ServletProperties.JAXRS_APPLICATION_CLASS,
+        JerseyApplicationConfig.class.getName()
+    );
 
     return server;
   }

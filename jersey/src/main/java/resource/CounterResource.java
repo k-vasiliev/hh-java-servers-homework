@@ -3,14 +3,18 @@ package resource;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
-import model.Counter;
+import service.CounterService;
 
 @Path("/counter")
 public class CounterResource {
-  private final static Counter counter = new Counter();
+  private final CounterService counterService;
+
+  public CounterResource() {
+    counterService = new CounterService() ;
+  }
 
   @GET
   public Response getCounter() {
-    return Response.ok(counter.get()).build();
+    return Response.ok(counterService.getCounterValue()).build();
   }
 }
