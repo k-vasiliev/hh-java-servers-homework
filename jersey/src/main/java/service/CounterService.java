@@ -1,14 +1,32 @@
 package service;
 
-import model.Counter;
+import dao.CounterDao;
+import dto.CounterDto;
 
 public class CounterService {
-  private final static Counter counter = new Counter();
+  private final static CounterDao counterDao = CounterDao.getInstance();
+  private final static CounterService instance = new CounterService();
 
-  public CounterService() {
+  private CounterService() {
   }
 
-  public Long getCounterValue() {
-    return counter.get();
+  public static CounterService getInstance() {
+    return instance;
+  }
+
+  public CounterDto getCounterValue() {
+    return new CounterDto(counterDao.get());
+  }
+
+  public void incrementCounter() {
+    counterDao.increment();
+  }
+
+  public void clearCounter() {
+    counterDao.clear();
+  }
+
+  public void decrementCounter(long delta) {
+    counterDao.decrement(delta);
   }
 }

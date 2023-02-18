@@ -3,7 +3,7 @@ package resourse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.Counter;
+import dao.Counter;
 import org.eclipse.jetty.util.StringUtil;
 
 import java.io.IOException;
