@@ -1,23 +1,21 @@
-import model.Counter;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHandler;
+import resourse.ResourceCounter;
 
 public class ServletApplication {
+  private final static int PORT = 8081;
 
-  public static void main(String[] args) {
-    Counter counter = new Counter();
+  public static void main(String[] args) throws Exception {
+    Server server = createServer();
+    server.start();
+    server.join();
+  }
 
-    System.out.println("counter = " + counter.get());
-    counter.increment();
-    counter.increment();
-    counter.increment();
-    counter.increment();
-    System.out.println("counter = " + counter.get());
-counter.decrement(3L);
-    System.out.println("counter = " + counter.get());
-counter.clear();
-    System.out.println("counter = " + counter.get());
-counter.increment();
-    counter.decrement(3L);
-    System.out.println("counter = " + counter.get());
-    // run, Jetty, run!
+  private static Server createServer() {
+    Server server = new Server(PORT);
+    ServletHandler servletHandler = new ServletHandler();
+    servletHandler.addServletWithMapping(ResourceCounter.class, "/");
+    server.setHandler(servletHandler);
+    return server;
   }
 }
