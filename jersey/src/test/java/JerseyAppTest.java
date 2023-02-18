@@ -214,7 +214,7 @@ public class JerseyAppTest {
   private static void waitUntilServerUp() {
     Awaitility.await()
         .atMost(10, TimeUnit.SECONDS)
-        .pollInterval(1000, TimeUnit.MILLISECONDS)
+        .pollInterval(500, TimeUnit.MILLISECONDS)
         .until(JerseyAppTest::isServerUp, IsEqual.equalTo(true));
   }
 
