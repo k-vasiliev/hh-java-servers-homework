@@ -26,6 +26,6 @@ public class CounterDao {
   }
 
   public void decrement(long delta) {
-    count.add(-delta);
+    count.add(delta);
   }
 }
