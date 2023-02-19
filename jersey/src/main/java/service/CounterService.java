@@ -4,7 +4,7 @@ import dao.CounterDao;
 import dto.CounterDto;
 
 public class CounterService {
-  private final static CounterDao counterDao = CounterDao.getInstance();
+  private final CounterDao counterDao = CounterDao.getInstance();
   private final static CounterService instance = new CounterService();
 
   private CounterService() {

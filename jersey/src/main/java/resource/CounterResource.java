@@ -38,20 +38,22 @@ public class CounterResource {
 
   @DELETE
   public Response decrementCounter(@HeaderParam(value = "Subtraction-Value") String deltaValue) {
-    if (StringUtil.isNotBlank(deltaValue)) {
-      try {
-        counterService.decrementCounter(Long.parseLong(deltaValue));
-        return Response.ok().build();
-      } catch (NumberFormatException err) {
-        return Response
-            .status(Response.Status.BAD_REQUEST)
-            .entity("Bad number format.")
-            .build();
-      }
+    if (StringUtil.isBlank(deltaValue)) {
+      return Response
+          .status(Response.Status.BAD_REQUEST)
+          .entity("Number is absent.")
+          .build();
     }
-    return Response
-        .status(Response.Status.BAD_REQUEST)
-        .entity("Number is absent.")
-        .build();
+
+    try {
+      counterService.decrementCounter(Long.parseLong(deltaValue));
+      return Response.ok().build();
+    } catch (NumberFormatException err) {
+      return Response
+          .status(Response.Status.BAD_REQUEST)
+          .entity("Bad number format.")
+          .build();
+    }
+
   }
 }
