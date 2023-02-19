@@ -16,7 +16,7 @@ public class CounterServlet extends HttpServlet {
 
   private final InMemoryStorage storage;
 
-  private static final Logger log = LoggerFactory.getLogger(CounterServlet.class);
+  private final Logger log = LoggerFactory.getLogger(CounterServlet.class);
 
   public CounterServlet() {;
     storage = InMemoryStorage.getInstance();
