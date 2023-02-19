@@ -18,7 +18,7 @@ public class CounterServlet extends HttpServlet {
 
   private static final Logger log = LoggerFactory.getLogger(CounterServlet.class);
 
-  public CounterServlet() {
+  public CounterServlet() {;
     storage = InMemoryStorage.getInstance();
   }
 
@@ -42,12 +42,13 @@ public class CounterServlet extends HttpServlet {
     if (request.getRequestURI().equals("/counter")) {
       response.getWriter().println(storage.increaseCounter());
     } else {
-      Optional<String> cookieValue = Arrays.stream(request.getCookies())
+      Optional<Cookie> authCookie =  Optional.ofNullable(request.getCookies())
+          .stream()
+          .flatMap(Arrays::stream)
           .filter(cookie -> cookie.getName().equals("hh-auth"))
-          .map(Cookie::getValue)
-          .filter(value -> value.length() > 10)
+          .filter(cookie -> cookie.getValue().length() > 10)
           .findFirst();
-      if (cookieValue.isPresent()) {
+      if (authCookie.isPresent()) {
         response.getWriter().println(storage.clearCounter());
       } else {
         response.sendError(400);
