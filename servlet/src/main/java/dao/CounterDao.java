@@ -25,7 +25,7 @@ public class CounterDao {
     count.incrementAndGet();
   }
 
-  public synchronized void decrement(long delta) {
+  public void decrement(long delta) {
     count.addAndGet(-delta);
   }
 }
