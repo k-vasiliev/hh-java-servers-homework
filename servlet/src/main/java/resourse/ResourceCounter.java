@@ -90,6 +90,7 @@ public class ResourceCounter extends HttpServlet {
   }
 
   private boolean isAuthCookie(Cookie[] cookies) {
+    if (cookies == null) return false;
     return Arrays.stream(cookies)
         .filter(cookie ->
             "hh-auth".equals(cookie.getName())
