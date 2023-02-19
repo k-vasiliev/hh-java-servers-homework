@@ -27,10 +27,13 @@ public class JerseyAppTest {
   private static final String HOST = "http://localhost:8081";
   private final static ObjectMapper objectMapper = new ObjectMapper();
   private static AsyncHttpClient client;
+  private static boolean isServerUp;
 
   @BeforeEach
   public void init() {
     client.getConfig().getCookieStore().clear();
+
+    assertTrue(isServerUp, "Server is down or not responding to /status");
   }
 
   @BeforeAll
@@ -84,10 +87,22 @@ public class JerseyAppTest {
   }
 
   @Test
-  public void testClearAuthWorksCorrect() throws Exception {
+  public void testClearAuthWorksCorrectWithShortCookie() throws Exception {
     increaseCounter().get();
 
     Response response = clearCounter("some").get();
+    int statusCode = response.getStatusCode();
+    assertTrue(statusCode >= 400 && statusCode < 500);
+
+    int counterValue = getCounterValue();
+    assertNotEquals(0, counterValue, "Counter is cleared, but should not");
+  }
+
+  @Test
+  public void testClearAuthWorksCorrectWithoutCookie() throws Exception {
+    increaseCounter().get();
+
+    Response response = clearCounter(null).get();
     int statusCode = response.getStatusCode();
     assertTrue(statusCode >= 400 && statusCode < 500);
 
@@ -105,9 +120,9 @@ public class JerseyAppTest {
       futures.add(increaseCounter());
     }
 
-    Integer result = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-        .thenApply(v -> getCounterValue())
-        .get();
+    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
+    int result = getCounterValue();
+
     assertEquals(initValue + increaseTo, result, "Counter is not thread safe");
   }
 
@@ -129,9 +144,9 @@ public class JerseyAppTest {
       futures.add(decreaseCounter(1));
     }
 
-    Integer result = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-        .thenApply(v -> getCounterValue())
-        .get();
+    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
+
+    int result = getCounterValue();
     assertEquals(initValue + increaseTo - decreaseTo, result, "Counter is not thread safe");
   }
 
@@ -140,7 +155,9 @@ public class JerseyAppTest {
     String url = HOST + "/counter/clear";
     Uri uri = Uri.create(url);
 
-    cookieStore.add(uri, new DefaultCookie("hh-auth", authCookieValue));
+    if (authCookieValue != null) {
+      cookieStore.add(uri, new DefaultCookie("hh-auth", authCookieValue));
+    }
     return client.preparePost(url)
         .execute()
         .toCompletableFuture();
@@ -168,7 +185,7 @@ public class JerseyAppTest {
     try {
       Response response = client.prepareGet(HOST + "/counter")
           .execute()
-          .get();
+          .get(5L, TimeUnit.SECONDS);
 
       assertTrue(isStatusCodeOk(response));
 
@@ -208,6 +225,7 @@ public class JerseyAppTest {
     thread.start();
 
     waitUntilServerUp();
+    isServerUp = true;
     return thread;
   }
 
