@@ -9,7 +9,6 @@ public class CounterDto {
   private long value;
 
   public CounterDto(long value) {
-
     date = ZonedDateTime.now();
     this.value = value;
   }

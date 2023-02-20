@@ -9,6 +9,7 @@ public class CounterResourceConfig extends ResourceConfig {
   public CounterResourceConfig() {
     register(CounterResource.class);
     register(StatusResource.class);
+    register(LogFilter.class);
   }
 
 }
