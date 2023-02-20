@@ -1,23 +1,23 @@
 package counter;
 
+import jakarta.servlet.DispatcherType;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlet.ServletMapping;
+
+import java.util.EnumSet;
 
 public class JettyServer {
 
   private final Server server;
 
-  public JettyServer(int port) throws Exception {
+  public JettyServer(int port) {
     ServletHandler servletHandler = new ServletHandler();
-    ServletHolder cunterServletHolder = new ServletHolder(new CounterServlet());
-    ServletMapping servletMapping = new ServletMapping();
-    servletMapping.setServletName(cunterServletHolder.getName());
-    servletMapping.setPathSpecs(new String[]{"/counter", "/counter/clear"});
-    servletHandler.addServlet(cunterServletHolder);
-    servletHandler.addServletMapping(servletMapping);
+
     servletHandler.addServletWithMapping(StatusServlet.class, "/status");
+    servletHandler.addServletWithMapping(CounterServlet.class, "/counter");
+    servletHandler.addServletWithMapping(CounterClearServlet.class, "/counter/clear");
+    servletHandler.addFilterWithMapping(LogFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+
     server = new Server(port);
     server.setHandler(servletHandler);
   }

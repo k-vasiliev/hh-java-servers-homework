@@ -7,49 +7,34 @@ import java.util.concurrent.atomic.LongAdder;
 
 public class InMemoryStorage {
 
-  private LongAdder counter;
+  private static final LongAdder counter = new LongAdder();
 
-  private static Logger log;
+  private static final Logger log = LoggerFactory.getLogger(InMemoryStorage.class);
 
-  private static InMemoryStorage instance;
-
-  private InMemoryStorage() {
-    counter = new LongAdder();
-    log = LoggerFactory.getLogger(InMemoryStorage.class);
-  }
+  private static final InMemoryStorage instance = new InMemoryStorage();
 
   public static InMemoryStorage getInstance() {
-    if (instance == null) {
-      instance = new InMemoryStorage();
-    }
     return instance;
   }
 
   public long getCounter() {
-    logCounterInfo();
+    log.info("Current counter value: {}", counter.longValue());
     return counter.longValue();
   }
 
   public long increaseCounter() {
     counter.increment();
-    logCounterInfo();
-    return counter.longValue();
+    return getCounter();
   }
 
   public long reductionCounter(long reductionValue) {
     counter.add(-1L * reductionValue);
-    logCounterInfo();
-    return counter.longValue();
+    return getCounter();
   }
 
   public long clearCounter() {
     counter.reset();
-    logCounterInfo();
-    return counter.longValue();
-  }
-
-  private void logCounterInfo() {
-    log.info("Current counter value: {}", counter.longValue());
+    return getCounter();
   }
 
 }

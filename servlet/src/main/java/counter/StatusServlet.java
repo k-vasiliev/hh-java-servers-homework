@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class StatusServlet extends HttpServlet {
 
+  @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) {
     response.setStatus(200);
   }
