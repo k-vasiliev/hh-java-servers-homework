@@ -1,5 +1,6 @@
-name: tests
+name: build
 on: pull_request
+
 jobs:
   run_tests:
     runs-on: ubuntu-latest
@@ -18,3 +19,10 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Run tests with Maven
         run: mvn -B test --file pom.xml
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v3
+        if: always() # always run even if the previous step fails
+        with:
+          name: junit-test-results
+          path: '**/target/surefire-reports/TEST-*.xml'
+          retention-days: 1
