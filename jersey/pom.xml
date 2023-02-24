@@ -16,8 +16,8 @@
 
     <properties>
         <jersey.version>3.0.8</jersey.version>
-        <maven.compiler.target>19</maven.compiler.target>
-        <maven.compiler.source>19</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
     </properties>
 
     <dependencies>
@@ -57,8 +57,13 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.14.2</version>
-            <scope>test</scope>
+            <version>2.14.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.14.1</version>
         </dependency>
     </dependencies>
     <build>
