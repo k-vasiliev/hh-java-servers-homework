@@ -7,28 +7,28 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class CounterCommonService {
     private final static Logger LOGGER = getLogger(CounterCommonService.class);
 
-    private final static Counter counter = new Counter();
+    private final static Counter COUNTER = new Counter();
 
     public CounterDto getCounterValue() {
-        var value = counter.getValue();
+        var value = COUNTER.getValue();
         LOGGER.info("Get counter's value: " + value);
         return new CounterDto(value);
     }
 
     public void upCounterValue() {
-        counter.add(1L);
+        COUNTER.add(1L);
         LOGGER.info("UpCounterValue was called");
     }
 
     public void reduceCounterValueBy(long value) {
         var negativeValue = -1L * value;
 //        counter.add(negativeValue);
-        counter.add(-1L * value);
+        COUNTER.add(-1L * value);
         LOGGER.info("Counter was reduced by " + value);
     }
 
     public void cleanCounterValue() {
-        counter.clean();
+        COUNTER.clean();
         LOGGER.info("Counter was cleaned");
     }
 }

@@ -16,20 +16,8 @@ public class CounterServlet extends HttpServlet {
     private final Map<String, BiConsumer<HttpServletRequest, HttpServletResponse>> postHandles = new HashMap<>();
 
     public CounterServlet() {
-        postHandles.put("/counter",
-                (request, response) -> {
-                     service.upCounterValue();
-                     response.setStatus(HttpServletResponse.SC_OK);
-                });
-        postHandles.put("/counter/clear",
-                (request, response) -> {
-                    if (!isAuthorized(request)) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        return;
-                    }
-                    service.cleanCounterValue();
-                    response.setStatus(HttpServletResponse.SC_OK);
-                });
+        postHandles.put("/counter", this::upCounterPost);
+        postHandles.put("/counter/clear", this::cleanCounterPost);
     }
 
     private boolean isAuthorized(HttpServletRequest request) {
@@ -63,6 +51,21 @@ public class CounterServlet extends HttpServlet {
         }
 
         handle.accept(request, response);
+   }
+
+   private void upCounterPost(HttpServletRequest request, HttpServletResponse response) {
+         service.upCounterValue();
+         response.setStatus(HttpServletResponse.SC_OK);
+   }
+
+   private void cleanCounterPost(HttpServletRequest request, HttpServletResponse response) {
+        if (!isAuthorized(request)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        service.cleanCounterValue();
+        response.setStatus(HttpServletResponse.SC_OK);
    }
 
     @Override
