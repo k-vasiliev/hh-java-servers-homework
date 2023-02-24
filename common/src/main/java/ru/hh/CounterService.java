@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class CounterCommonService {
-    private final static Logger LOGGER = getLogger(CounterCommonService.class);
+public class CounterService {
+    private final static Logger LOGGER = getLogger(CounterService.class);
 
     private final static Counter COUNTER = new Counter();
 
@@ -22,8 +22,7 @@ public class CounterCommonService {
 
     public void reduceCounterValueBy(long value) {
         var negativeValue = -1L * value;
-//        counter.add(negativeValue);
-        COUNTER.add(-1L * value);
+        COUNTER.add(negativeValue);
         LOGGER.info("Counter was reduced by " + value);
     }
 

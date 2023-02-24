@@ -11,19 +11,19 @@ import jakarta.ws.rs.HeaderParam;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import mapper.CounterJsonMapper;
+import mapper.JsonMapper;
 import ru.hh.Constants;
-import ru.hh.CounterCommonService;
+import ru.hh.CounterService;
 
 @Path("/counter")
 public class CounterResource {
-    private final CounterCommonService service = new CounterCommonService();
+    private final CounterService service = new CounterService();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCounter() throws JsonProcessingException {
         var dto = service.getCounterValue();
-        var json = CounterJsonMapper.toJson(dto);
+        var json = JsonMapper.toJson(dto);
         return Response.ok(json).build();
     }
 
@@ -44,7 +44,7 @@ public class CounterResource {
     }
 
     public boolean isAuthorized(String value) {
-        return value != null && value.length() > 10;
+        return value != null && value.length() > Constants.COOKIE_PARAM_LENGTH;
     }
 
     @DELETE
@@ -54,7 +54,7 @@ public class CounterResource {
             service.reduceCounterValueBy(number);
             return Response.ok().build();
         }
-        catch (Exception ex) {
+        catch (NumberFormatException ex) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }

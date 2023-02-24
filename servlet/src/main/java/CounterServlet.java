@@ -9,10 +9,10 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 import ru.hh.Constants;
-import ru.hh.CounterCommonService;
+import ru.hh.CounterService;
 
 public class CounterServlet extends HttpServlet {
-    private final CounterCommonService service = new CounterCommonService();
+    private final CounterService service = new CounterService();
     private final Map<String, BiConsumer<HttpServletRequest, HttpServletResponse>> postHandles = new HashMap<>();
 
     public CounterServlet() {
@@ -26,7 +26,7 @@ public class CounterServlet extends HttpServlet {
         return cookies != null && Stream.of(cookies)
                 .anyMatch(cookie -> cookie.getName().equals(Constants.COOKIE_PARAMETER) &&
                                     cookie.getValue() != null &&
-                                    cookie.getValue().length() > 10);
+                                    cookie.getValue().length() > Constants.COOKIE_PARAM_LENGTH);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class CounterServlet extends HttpServlet {
             service.reduceCounterValueBy(value);
             response.setStatus(HttpServletResponse.SC_OK);
         }
-        catch (Exception ex) {
+        catch (NumberFormatException ex) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
