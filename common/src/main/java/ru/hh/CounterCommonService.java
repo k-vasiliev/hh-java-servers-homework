@@ -7,12 +7,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class CounterCommonService {
     private final static Logger LOGGER = getLogger(CounterCommonService.class);
 
-    private final Counter counter = new Counter();
+    private final static Counter counter = new Counter();
 
-    public long getCounterValue() {
+    public CounterDto getCounterValue() {
         var value = counter.getValue();
         LOGGER.info("Get counter's value: " + value);
-        return value;
+        return new CounterDto(value);
     }
 
     public void upCounterValue() {
@@ -22,7 +22,8 @@ public class CounterCommonService {
 
     public void reduceCounterValueBy(long value) {
         var negativeValue = -1L * value;
-        counter.add(negativeValue);
+//        counter.add(negativeValue);
+        counter.add(-1L * value);
         LOGGER.info("Counter was reduced by " + value);
     }
 
