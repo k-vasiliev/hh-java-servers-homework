@@ -7,7 +7,11 @@ import java.net.URI;
 public class JerseyApplication  {
 
   private static Server createServer() {
-    ResourceConfig config = new ResourceConfig(CounterResource.class, StatusResource.class);
+    ResourceConfig config = new ResourceConfig(
+      CounterResource.class,
+      StatusResource.class,
+      ObjectMapperCustom.class);
+
     return JettyHttpContainerFactory.createServer(URI.create("http://localhost:8081/"), config);
   }
 

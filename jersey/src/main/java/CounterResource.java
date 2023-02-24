@@ -16,8 +16,7 @@ public class CounterResource {
   @Produces("application/json")
   public Response getCounter() {
     CounterValueHolder valueHolder = new CounterValueHolder(
-      CounterService.getCounter(),
-      Instant.now().toString());
+      CounterService.getCounter(), Instant.now());
 
     return Response.ok(valueHolder).build();
   }
