@@ -8,13 +8,14 @@ import java.util.HashMap;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
+import ru.hh.Constants;
 import ru.hh.CounterCommonService;
 
 public class CounterServlet extends HttpServlet {
     private final CounterCommonService service = new CounterCommonService();
     private final Map<String, BiConsumer<HttpServletRequest, HttpServletResponse>> postHandles = new HashMap<>();
 
-    private CounterServlet() {
+    public CounterServlet() {
         postHandles.put("/counter",
                 (request, response) -> {
                      service.upCounterValue();
@@ -23,7 +24,7 @@ public class CounterServlet extends HttpServlet {
         postHandles.put("/counter/clear",
                 (request, response) -> {
                     if (!isAuthorized(request)) {
-                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         return;
                     }
                     service.cleanCounterValue();
@@ -33,12 +34,11 @@ public class CounterServlet extends HttpServlet {
 
     private boolean isAuthorized(HttpServletRequest request) {
         var cookies = request.getCookies();
-        var thereIsCookies = cookies == null;
-        var cookiesContainToken = Stream.of(cookies)
-                .anyMatch(cookie -> cookie.getName().equals("hh-ru") &&
+
+        return cookies != null && Stream.of(cookies)
+                .anyMatch(cookie -> cookie.getName().equals(Constants.COOKIE_PARAMETER) &&
                                     cookie.getValue() != null &&
                                     cookie.getValue().length() > 10);
-        return thereIsCookies && cookiesContainToken;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class CounterServlet extends HttpServlet {
         response.setContentType("text/plain");
 
         try (var writer = response.getWriter()) {
-            writer.print(service.getCounterValue());
+            writer.println(service.getCounterValue().value);
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
@@ -68,7 +68,7 @@ public class CounterServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
         try {
-            var str = request.getParameter("Subtraction-Value");
+            var str = request.getHeader(Constants.HEADER_PARAMETER);
             var value = Long.parseLong(str);
             service.reduceCounterValueBy(value);
             response.setStatus(HttpServletResponse.SC_OK);

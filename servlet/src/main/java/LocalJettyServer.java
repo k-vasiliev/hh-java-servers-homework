@@ -8,7 +8,7 @@ public class LocalJettyServer {
         server = new Server(port);
         var servletHandler = new ServletHandler();
         servletHandler.addServletWithMapping(StatusServlet.class, "/status");
-        servletHandler.addServletWithMapping(CounterServlet.class, "/counter");
+        servletHandler.addServletWithMapping(CounterServlet.class, "/counter/*");
         server.setHandler(servletHandler);
     }
 
