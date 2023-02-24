@@ -44,7 +44,7 @@ public class CounterResource {
   @Path(value = "/counter/clear")
   public Response clearCounter(@CookieParam("hh-auth") String authToken) {
     if (authToken == null || authToken.length() < HH_AUTH_TOKEN_MIN_LENGTH) {
-      return Response.status(Response.Status.BAD_REQUEST).build();
+      return Response.status(Response.Status.UNAUTHORIZED).build();
     }
 
     CounterService.clearCounter();
