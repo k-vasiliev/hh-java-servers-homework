@@ -11,6 +11,8 @@ import java.time.Instant;
 
 @Path("/")
 public class CounterResource {
+  private static final int HH_AUTH_TOKEN_MIN_LENGTH = 11;
+
   @GET
   @Path(value = "/counter")
   @Produces("application/json")
@@ -41,7 +43,7 @@ public class CounterResource {
   @POST
   @Path(value = "/counter/clear")
   public Response clearCounter(@CookieParam("hh-auth") String authToken) {
-    if (authToken == null || authToken.length() <= 10) {
+    if (authToken == null || authToken.length() < HH_AUTH_TOKEN_MIN_LENGTH) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
