@@ -58,10 +58,10 @@ public class ServletApplicationTest {
     increaseCounter().get();
 
     Response response = decreaseCounter(2).get();
-    assertTrue(isStatusCodeOk(response),  "Server response is not ok");
+    assertTrue(isStatusCodeOk(response), "Server response is not ok");
 
     int counterValue = getCounterValue();
-    assertEquals(initCounterValue + 3 - 2, counterValue, "Subtraction is not works properly");
+    assertEquals(initCounterValue + 3 - 2, counterValue, "Subtraction does not works properly");
   }
 
   @Test
@@ -74,14 +74,26 @@ public class ServletApplicationTest {
     assertTrue(isStatusCodeOk(response));
 
     int counterValue = getCounterValue();
-    assertEquals(0, counterValue, "Counter is not cleared");
+    assertEquals(0, counterValue, "Counter didn't cleared");
   }
 
   @Test
-  public void testClearAuthWorksCorrect() throws Exception {
+  public void testClearAuthWorksCorrectWithShortCookie() throws Exception {
     increaseCounter().get();
 
     Response response = clearCounter("some").get();
+    int statusCode = response.getStatusCode();
+    assertTrue(statusCode >= 400 && statusCode < 500);
+
+    int counterValue = getCounterValue();
+    assertNotEquals(0, counterValue, "Counter is cleared, but should not");
+  }
+
+  @Test
+  public void testClearAuthWorksCorrectWithoutCookie() throws Exception {
+    increaseCounter().get();
+
+    Response response = clearCounter(null).get();
     int statusCode = response.getStatusCode();
     assertTrue(statusCode >= 400 && statusCode < 500);
 
@@ -99,9 +111,9 @@ public class ServletApplicationTest {
       futures.add(increaseCounter());
     }
 
-    Integer result = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-        .thenApply(v -> getCounterValue())
-        .get();
+    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
+    int result = getCounterValue();
+
     assertEquals(initValue + increaseTo, result, "Counter is not thread safe");
   }
 
@@ -123,9 +135,9 @@ public class ServletApplicationTest {
       futures.add(decreaseCounter(1));
     }
 
-    Integer result = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-        .thenApply(v -> getCounterValue())
-        .get();
+    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
+    int result = getCounterValue();
+
     assertEquals(initValue + increaseTo - decreaseTo, result, "Counter is not thread safe");
   }
 
@@ -134,10 +146,12 @@ public class ServletApplicationTest {
     String url = HOST + "/counter/clear";
     Uri uri = Uri.create(url);
 
-    cookieStore.add(uri, new DefaultCookie("hh-auth", authCookieValue));
+    if (authCookieValue != null) {
+      cookieStore.add(uri, new DefaultCookie("hh-auth", authCookieValue));
+    }
     return client.preparePost(url)
-        .execute()
-        .toCompletableFuture();
+            .execute()
+            .toCompletableFuture();
   }
 
   private boolean isStatusCodeOk(Response httpResponse) {
@@ -147,22 +161,22 @@ public class ServletApplicationTest {
 
   private CompletableFuture<Response> increaseCounter() {
     return client.preparePost(HOST + "/counter")
-        .execute()
-        .toCompletableFuture();
+            .execute()
+            .toCompletableFuture();
   }
 
   private CompletableFuture<Response> decreaseCounter(int value) {
     return client.prepareDelete(HOST + "/counter")
-        .addHeader("Subtraction-Value", String.valueOf(value))
-        .execute()
-        .toCompletableFuture();
+            .addHeader("Subtraction-Value", String.valueOf(value))
+            .execute()
+            .toCompletableFuture();
   }
 
   private int getCounterValue() {
     try {
       Response response = client.prepareGet(HOST + "/counter")
-          .execute()
-          .get();
+              .execute()
+              .get();
 
       assertTrue(isStatusCodeOk(response));
 
@@ -188,9 +202,9 @@ public class ServletApplicationTest {
 
   private static void waitUntilServerUp() {
     Awaitility.await()
-        .atMost(10, TimeUnit.SECONDS)
-        .pollInterval(500, TimeUnit.MILLISECONDS)
-        .until(ServletApplicationTest::isServerUp, IsEqual.equalTo(true));
+            .atMost(10, TimeUnit.SECONDS)
+            .pollInterval(500, TimeUnit.MILLISECONDS)
+            .until(ServletApplicationTest::isServerUp, IsEqual.equalTo(true));
   }
 
   private static boolean isServerUp() {
