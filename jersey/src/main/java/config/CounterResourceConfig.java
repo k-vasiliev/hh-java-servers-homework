@@ -14,4 +14,3 @@ public class CounterResourceConfig extends ResourceConfig {
         register(CounterClearResource.class);
     }
 }
-
