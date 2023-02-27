@@ -185,8 +185,13 @@ public class JerseyAppTest {
   private int getCounterValue() {
     try {
       Response response = client.prepareGet(HOST + "/counter")
+
               .execute()
               .get(5L, TimeUnit.SECONDS);
+
+          .execute()
+          .get(5L, TimeUnit.SECONDS);
+
 
       assertTrue(isStatusCodeOk(response));
 
