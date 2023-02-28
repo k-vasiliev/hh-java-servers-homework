@@ -36,6 +36,7 @@ public class CounterServlet extends HttpServlet {
       case "/counter" -> writer.print(counter);
     }
     writer.flush();
+
   }
 
   @Override
@@ -47,12 +48,12 @@ public class CounterServlet extends HttpServlet {
       case "/counter/clear" -> {
         if (cookieIsValid(req.getCookies())) {
           counter.getAndSet(0);
+          writer.print(counter);
         } else resp.setStatus(400);
-
-        writer.print(counter);
       }
     }
     writer.flush();
+
   }
 
   @Override
@@ -65,5 +66,6 @@ public class CounterServlet extends HttpServlet {
     }
     writer.print(counter);
     writer.flush();
+
   }
 }
