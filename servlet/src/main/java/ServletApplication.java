@@ -6,7 +6,7 @@ public class ServletApplication {
   private static Server createServer(int port) {
     Server server = new Server(port);
     ServletHandler servletHandler = new ServletHandler();
-    servletHandler.addServletWithMapping(CounterServlet.class, "/*");
+    servletHandler.addServletWithMapping(CounterServlet.class, "/");
     server.setHandler(servletHandler);
     return server;
   }
