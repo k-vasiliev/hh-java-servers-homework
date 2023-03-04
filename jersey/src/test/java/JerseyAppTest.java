@@ -56,7 +56,7 @@ public class JerseyAppTest {
     assertTrue(isStatusCodeOk(response), "Server response is not ok");
 
     int counterValue = getCounterValue();
-    assertEquals(initCounterValue + 1, counterValue, "Counter value didnt change");
+    assertEquals(initCounterValue + 1, counterValue, "controller.Counter value didnt change");
   }
 
   @Test
@@ -84,7 +84,7 @@ public class JerseyAppTest {
     assertTrue(isStatusCodeOk(response));
 
     int counterValue = getCounterValue();
-    assertEquals(0, counterValue, "Counter didn't cleared");
+    assertEquals(0, counterValue, "controller.Counter didn't cleared");
   }
 
   @Test
@@ -96,7 +96,7 @@ public class JerseyAppTest {
     assertTrue(statusCode >= 400 && statusCode < 500);
 
     int counterValue = getCounterValue();
-    assertNotEquals(0, counterValue, "Counter is cleared, but should not");
+    assertNotEquals(0, counterValue, "controller.Counter is cleared, but should not");
   }
 
   @Test
@@ -108,7 +108,7 @@ public class JerseyAppTest {
     assertTrue(statusCode >= 400 && statusCode < 500);
 
     int counterValue = getCounterValue();
-    assertNotEquals(0, counterValue, "Counter is cleared, but should not");
+    assertNotEquals(0, counterValue, "controller.Counter is cleared, but should not");
   }
 
   @Test
@@ -124,7 +124,7 @@ public class JerseyAppTest {
     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
     int result = getCounterValue();
 
-    assertEquals(initValue + increaseTo, result, "Counter is not thread safe");
+    assertEquals(initValue + increaseTo, result, "controller.Counter is not thread safe");
   }
 
   @Test
@@ -148,7 +148,7 @@ public class JerseyAppTest {
     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
 
     int result = getCounterValue();
-    assertEquals(initValue + increaseTo - decreaseTo, result, "Counter is not thread safe");
+    assertEquals(initValue + increaseTo - decreaseTo, result, "controller.Counter is not thread safe");
   }
 
   private CompletableFuture<Response> clearCounter(String authCookieValue) {
@@ -193,10 +193,10 @@ public class JerseyAppTest {
       JsonNode jsonNode = objectMapper.readTree(response.getResponseBody());
 
       JsonNode counterValue = jsonNode.path("value");
-      assertFalse(counterValue.isMissingNode(), "Counter value field wasn't found");
+      assertFalse(counterValue.isMissingNode(), "controller.Counter value field wasn't found");
 
       JsonNode counterDate = jsonNode.path("date");
-      assertFalse(counterDate.isMissingNode(), "Counter date field wasn't found");
+      assertFalse(counterDate.isMissingNode(), "controller.Counter date field wasn't found");
 
       assertTrue(isIsoDateFormat(counterDate.textValue()), "Date is not in iso format");
 
