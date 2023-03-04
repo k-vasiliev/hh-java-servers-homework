@@ -9,12 +9,12 @@ import java.io.PrintWriter;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@WebServlet(urlPatterns = {"/status", "/counter", "/counter/clear"})
+@WebServlet(urlPatterns = {"/status", "/counter"})
 public class CounterServlet extends HttpServlet {
   private AtomicInteger counter;
 
   public void init() {
-    counter = new AtomicInteger(0);
+    counter = new AtomicInteger();
   }
 
   public boolean cookieIsValid(Cookie[] cookies) {
@@ -36,7 +36,6 @@ public class CounterServlet extends HttpServlet {
       case "/counter" -> writer.print(counter);
     }
     writer.flush();
-
   }
 
   @Override
@@ -49,11 +48,11 @@ public class CounterServlet extends HttpServlet {
         if (cookieIsValid(req.getCookies())) {
           counter.getAndSet(0);
           writer.print(counter);
-        } else resp.setStatus(400);
+        }
+        else resp.setStatus(400);
       }
     }
     writer.flush();
-
   }
 
   @Override
@@ -66,6 +65,5 @@ public class CounterServlet extends HttpServlet {
     }
     writer.print(counter);
     writer.flush();
-
   }
 }

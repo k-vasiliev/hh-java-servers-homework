@@ -2,9 +2,10 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 
 public class ServletApplication {
+  private static final int PORT = 8081;
 
-  private static Server createServer(int port) {
-    Server server = new Server(port);
+  private static Server createServer() {
+    Server server = new Server(PORT);
     ServletHandler servletHandler = new ServletHandler();
     servletHandler.addServletWithMapping(CounterServlet.class, "/");
     server.setHandler(servletHandler);
@@ -12,9 +13,7 @@ public class ServletApplication {
   }
 
   public static void main(String[] args) throws Exception {
-    // run, Jetty, run!
-    int port = 8081;
-    Server server = createServer(port);
+    Server server = createServer();
     server.start();
     server.join();
   }
