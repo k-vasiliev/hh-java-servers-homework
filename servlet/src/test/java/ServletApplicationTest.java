@@ -46,7 +46,7 @@ public class ServletApplicationTest {
     assertTrue(isStatusCodeOk(response), "Server response is not ok");
 
     int counterValue = getCounterValue();
-    assertEquals(initCounterValue + 1, counterValue, "Counter value didnt change");
+    assertEquals(initCounterValue + 1, counterValue, "util.Counter value didnt change");
   }
 
   @Test
@@ -74,7 +74,7 @@ public class ServletApplicationTest {
     assertTrue(isStatusCodeOk(response));
 
     int counterValue = getCounterValue();
-    assertEquals(0, counterValue, "Counter didn't cleared");
+    assertEquals(0, counterValue, "util.Counter didn't cleared");
   }
 
   @Test
@@ -86,7 +86,7 @@ public class ServletApplicationTest {
     assertTrue(statusCode >= 400 && statusCode < 500);
 
     int counterValue = getCounterValue();
-    assertNotEquals(0, counterValue, "Counter is cleared, but should not");
+    assertNotEquals(0, counterValue, "util.Counter is cleared, but should not");
   }
 
   @Test
@@ -98,7 +98,7 @@ public class ServletApplicationTest {
     assertTrue(statusCode >= 400 && statusCode < 500);
 
     int counterValue = getCounterValue();
-    assertNotEquals(0, counterValue, "Counter is cleared, but should not");
+    assertNotEquals(0, counterValue, "util.Counter is cleared, but should not");
   }
 
   @Test
@@ -114,7 +114,7 @@ public class ServletApplicationTest {
     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
     int result = getCounterValue();
 
-    assertEquals(initValue + increaseTo, result, "Counter is not thread safe");
+    assertEquals(initValue + increaseTo, result, "util.Counter is not thread safe");
   }
 
   @Test
@@ -138,7 +138,7 @@ public class ServletApplicationTest {
     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
     int result = getCounterValue();
 
-    assertEquals(initValue + increaseTo - decreaseTo, result, "Counter is not thread safe");
+    assertEquals(initValue + increaseTo - decreaseTo, result, "util.Counter is not thread safe");
   }
 
   private CompletableFuture<Response> clearCounter(String authCookieValue) {
