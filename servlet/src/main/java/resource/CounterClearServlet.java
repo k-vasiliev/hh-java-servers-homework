@@ -7,10 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import storage.StorageCounter;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.Objects;
 
 public class CounterClearServlet extends HttpServlet {
 
@@ -21,9 +19,14 @@ public class CounterClearServlet extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
     Cookie[] cookies = request.getCookies();
-    boolean auth = Arrays.stream(cookies)
-        .filter(cookie -> cookie.getName().equals("hh-auth"))
-        .anyMatch(cookie -> cookie.getValue().length() > REQUIREDLENGTH);
+    boolean auth;
+
+    if (Objects.isNull(cookies)) {auth = false;}
+    else {
+      auth = Arrays.stream(cookies)
+          .filter(cookie -> cookie.getName().equals("hh-auth"))
+          .anyMatch(cookie -> cookie.getValue().length() > REQUIREDLENGTH);
+    }
 
     if (auth){
       storageCounter.reset();
