@@ -19,8 +19,8 @@
         <java.servlet.api>4.0.1</java.servlet.api>
         <jersey.cdi2.se>3.0.8</jersey.cdi2.se>
         <jackson.version>2.14.2</jackson.version>
-        <maven.compiler.target>17</maven.compiler.target>
-        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>14</maven.compiler.target>
+        <maven.compiler.source>14</maven.compiler.source>
     </properties>
 
     <dependencies>
