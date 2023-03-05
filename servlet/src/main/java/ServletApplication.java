@@ -3,22 +3,17 @@ import jakarta.servlet.DispatcherType;
 import listener.CounterAppContextListener;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import servlet.CounterCleanerServlet;
 import servlet.CounterServlet;
 import servlet.StatusServlet;
 
 import java.util.EnumSet;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.LongAdder;
 
 public class ServletApplication {
 
   private static Server createServer(int port) {
     Server server = new Server(port);
 
-    // config resources, jersey servlet
     ServletContextHandler ctx = new ServletContextHandler();
 
 
