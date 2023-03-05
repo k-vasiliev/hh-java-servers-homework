@@ -17,10 +17,7 @@ import java.time.format.DateTimeFormatter;
 @Path("/counter")
 public class CounterResource {
     private static final String HEADER_SUBTRACTION = "Subtraction-Value";
-    private static final ObjectMapper mapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper mapper = create();
     @Inject
     private CounterService counterService;
 
@@ -52,7 +49,7 @@ public class CounterResource {
     @Produces(value = MediaType.APPLICATION_JSON)
     public Response clearCounter(@CookieParam("hh-auth") final String auth) {
         if (auth != null && new String(auth.getBytes(StandardCharsets.UTF_8)).length() > 10) {
-            counterService.increment();
+            counterService.reset();
             return Response.noContent().build();
         }
         return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -66,5 +63,12 @@ public class CounterResource {
             return Response.noContent().build();
         }
         return Response.status(Response.Status.FORBIDDEN).build();
+    }
+
+    public static ObjectMapper create() {
+        return new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 }
