@@ -1,20 +1,25 @@
 package entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.time.Instant;
+
 public class Counter {
 
-  private String date;
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private Instant date;
   private int value;
 
-  public Counter(String date, int value) {
+  public Counter(Instant date, int value) {
     this.date = date;
     this.value = value;
   }
 
-  public String getDate() {
+  public Instant getDate() {
     return date;
   }
 
-  public void setDate(String date) {
+  public void setDate(Instant date) {
     this.date = date;
   }
 

@@ -37,7 +37,7 @@ public class CounterResource {
   @GET
   @Path("/counter")
   public Counter getCounterAndDateValue() {
-    return new Counter(Instant.now().toString(), counter.get());
+    return new Counter(Instant.now(), counter.get());
   }
 
   @POST
