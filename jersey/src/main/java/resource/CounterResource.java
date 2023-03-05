@@ -51,6 +51,9 @@ public class CounterResource {
     @DELETE
     @Path(value = "/counter")
     public Response subtract(@HeaderParam(value = "Subtraction-Value") Long value){
+        if(value == null){
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         try{
             counterService.subtract(value);
         }catch (ArithmeticException e){
