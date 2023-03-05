@@ -11,13 +11,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @WebServlet(urlPatterns = {"/status", "/counter"})
 public class CounterServlet extends HttpServlet {
+
   private AtomicInteger counter;
 
   public void init() {
     counter = new AtomicInteger();
   }
 
-  public boolean cookieIsValid(Cookie[] cookies) {
+  public boolean isCookieValid(Cookie[] cookies) {
     return Objects.nonNull(cookies) &&
       cookies[0].getValue().length() > 10;
   }
@@ -45,7 +46,7 @@ public class CounterServlet extends HttpServlet {
     switch (req.getRequestURI()) {
       case "/counter" -> writer.print(counter.incrementAndGet());
       case "/counter/clear" -> {
-        if (cookieIsValid(req.getCookies())) {
+        if (isCookieValid(req.getCookies())) {
           counter.getAndSet(0);
           writer.print(counter);
         }
@@ -66,4 +67,5 @@ public class CounterServlet extends HttpServlet {
     writer.print(counter);
     writer.flush();
   }
+
 }

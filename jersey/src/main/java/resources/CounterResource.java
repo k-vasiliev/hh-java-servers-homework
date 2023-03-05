@@ -1,7 +1,6 @@
 package resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import entities.Counter;
 import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -20,17 +19,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 public class CounterResource {
+
   private static final AtomicInteger counter = new AtomicInteger();
-  private static final ObjectMapper mapper = new ObjectMapper();
 
-  private boolean cookieHaveValid(String value) {
+  private boolean isCookieValid(String value) {
     return Objects.nonNull(value) && value.length() > 10;
-  }
-
-  private ObjectNode createJson() {
-    return mapper.createObjectNode()
-      .put("value", counter.get())
-      .put("date", Instant.now().toString());
   }
 
   @GET
@@ -43,8 +36,8 @@ public class CounterResource {
 
   @GET
   @Path("/counter")
-  public Response getCounterAndDateValue() {
-    return Response.ok().entity(createJson()).build();
+  public Counter getCounterAndDateValue() {
+    return new Counter(Instant.now().toString(), counter.get());
   }
 
   @POST
@@ -67,10 +60,15 @@ public class CounterResource {
   @POST
   @Path("/counter/clear")
   public Response clearCounter(@CookieParam("hh-auth") String value) {
-    if (cookieHaveValid(value)) {
+    if (isCookieValid(value)) {
       counter.getAndSet(0);
-      return Response.ok().status(Response.Status.OK).build();
+      return Response.ok()
+        .status(Response.Status.OK)
+        .build();
     }
-    return Response.ok().status(400).build();
+    return Response.ok()
+      .status(Response.Status.BAD_REQUEST)
+      .build();
   }
+
 }

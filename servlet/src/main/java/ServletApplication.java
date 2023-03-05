@@ -2,6 +2,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 
 public class ServletApplication {
+
   private static final int PORT = 8081;
 
   private static Server createServer() {
@@ -17,4 +18,5 @@ public class ServletApplication {
     server.start();
     server.join();
   }
+
 }
