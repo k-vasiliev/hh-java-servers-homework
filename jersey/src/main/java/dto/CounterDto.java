@@ -5,21 +5,21 @@ import java.time.ZonedDateTime;
 public class CounterDto {
 
   private ZonedDateTime date;
-  private Long counter;
+  private Long value;
 
   public CounterDto() {
   }
 
   public CounterDto(Long counter) {
     date = ZonedDateTime.now();
-    this.counter = counter;
+    this.value = counter;
   }
 
   public ZonedDateTime getDate() {
     return date;
   }
 
-  public Long getCounter() {
-    return counter;
+  public Long getValue() {
+    return value;
   }
 }
