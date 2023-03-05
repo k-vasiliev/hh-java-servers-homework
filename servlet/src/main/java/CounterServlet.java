@@ -45,6 +45,9 @@ public class CounterServlet extends HttpServlet {
     }
 
     private boolean validate(HttpServletRequest req) {
+        if (req.getCookies() == null) {
+            return false;
+        }
         return Arrays.stream(req.getCookies())
                 .filter(cookie -> COOKIE_HH.equals(cookie.getName()))
                 .anyMatch(cookie -> cookie.getValue().length() > COOKIE_SIZE);

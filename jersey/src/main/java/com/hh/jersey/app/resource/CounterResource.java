@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -29,9 +32,7 @@ public class CounterResource {
     public Response getCounter() throws JsonProcessingException {
         long count = counterService.getCounter();
         Statistic statistic = new Statistic();
-        LocalDateTime localDate = LocalDateTime.now();
-        localDate.format(DateTimeFormatter.ISO_DATE);
-        statistic.setTime(localDate);
+        statistic.setDateTime(Instant.now());
         statistic.setValue(count);
 
         return Response.ok(mapper.writeValueAsString(statistic)).build();
@@ -67,8 +68,7 @@ public class CounterResource {
 
     public static ObjectMapper create() {
         return new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                .findAndRegisterModules()
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     }
 }
