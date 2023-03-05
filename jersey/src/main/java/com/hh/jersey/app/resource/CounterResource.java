@@ -1,12 +1,8 @@
 package com.hh.jersey.app.resource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -14,8 +10,6 @@ import jakarta.ws.rs.core.Response;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Path("/counter")
 public class CounterResource {
@@ -31,7 +25,7 @@ public class CounterResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCounter() throws JsonProcessingException {
         long count = counterService.getCounter();
-        Statistic statistic = new Statistic();
+        CounterInfo statistic = new CounterInfo();
         statistic.setDateTime(Instant.now());
         statistic.setValue(count);
 
