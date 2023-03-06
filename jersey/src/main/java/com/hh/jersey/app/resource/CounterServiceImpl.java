@@ -4,28 +4,40 @@ import jakarta.inject.Singleton;
 
 @Singleton
 public class CounterServiceImpl implements CounterService {
-    private long counter = 0L;
+    private volatile long counter = 0L;
+    private final Object monitor = new Object();
 
     public CounterServiceImpl() {
     }
 
     public long getCounter() {
-        return counter;
+        synchronized (monitor) {
+            return counter;
+        }
     }
 
     public void increment() {
-        this.counter++;
+        synchronized (monitor) {
+            this.counter++;
+        }
     }
 
     public void decrement() {
-        this.counter--;
+        synchronized (monitor) {
+            this.counter--;
+        }
     }
 
     public void reset() {
-        this.counter = 0;
+        synchronized (monitor) {
+            this.counter = 0;
+        }
+
     }
 
     public void decrementByValue(long value) {
-        this.counter -= value;
+        synchronized (monitor) {
+            this.counter -= value;
+        }
     }
 }
