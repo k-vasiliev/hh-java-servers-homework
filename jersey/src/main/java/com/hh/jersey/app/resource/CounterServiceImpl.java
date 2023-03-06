@@ -2,32 +2,30 @@ package com.hh.jersey.app.resource;
 
 import jakarta.inject.Singleton;
 
-import java.util.concurrent.atomic.LongAdder;
-
 @Singleton
 public class CounterServiceImpl implements CounterService {
-    private LongAdder counter = new LongAdder();
+    private long counter = 0L;
 
     public CounterServiceImpl() {
     }
 
     public long getCounter() {
-        return counter.longValue();
+        return counter;
     }
 
     public void increment() {
-        this.counter.increment();
+        this.counter++;
     }
 
     public void decrement() {
-        this.counter.decrement();
+        this.counter--;
     }
 
     public void reset() {
-        counter.reset();
+        this.counter = 0;
     }
 
     public void decrementByValue(long value) {
-        this.counter.add(-value);
+        this.counter -= value;
     }
 }
