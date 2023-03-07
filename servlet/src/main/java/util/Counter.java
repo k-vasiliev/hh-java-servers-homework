@@ -1,10 +1,11 @@
 package util;
 
+import java.util.concurrent.atomic.LongAdder;
+
 public class Counter {
-    private int count = 0;
+    private final LongAdder longAdder = new LongAdder();
     private static Counter counter;
 
-    private final Object monitor = new Object();
     private Counter() {}
     static public Counter getInstance() {
         if (counter == null) {
@@ -13,37 +14,29 @@ public class Counter {
         return counter;
     }
 
-    public int getCount() {
-        return count;
+    public long getCount() {
+        return longAdder.longValue();
     }
 
     public void increase() {
-        synchronized (monitor) {
-            this.count++;
-        }
+        longAdder.increment();
     }
 
     @SuppressWarnings("unused")
     public void increaseBy(int value) {
-        synchronized (monitor) {
-            this.count += value;
-        }
+        longAdder.add(value);
     }
 
     @SuppressWarnings("unused")
     public void decrease() {
-        synchronized (monitor) {
-            this.count--;
-        }
+        longAdder.decrement();
     }
 
     public void decreaseBy(int value) {
-        synchronized (monitor) {
-            this.count -= value;
-        }
+        longAdder.add(-value);
     }
 
     public void clear() {
-        count = 0;
+        longAdder.reset();
     }
 }
