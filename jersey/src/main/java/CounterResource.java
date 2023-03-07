@@ -29,14 +29,13 @@ public class CounterResource {
         if (value == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        else {
-            try {
-                counterService.subtractCounter(value);
-                return Response.ok().build();
-            }
-            catch (Exception e){
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            }
+        try {
+            counterService.subtractCounter(value);
+            return Response.ok().build();
+        }
+        catch (RuntimeException e){
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Bad number format.").build();
         }
     }
 
@@ -51,7 +50,7 @@ public class CounterResource {
     @Path(value = "/counter/clear")
     public Response clearCounter(@CookieParam("hh-auth") String cookie) {
         if (cookie == null || cookie.length()<10){
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         counterService.clear();
         return Response.ok(0).build();

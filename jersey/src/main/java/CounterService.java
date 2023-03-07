@@ -4,17 +4,30 @@ public class CounterService {
     private final AtomicInteger count;
 
     private static CounterService INSTANCE;
+    private static final Object mutex = new Object();
+
 
     private CounterService() {
         this.count = new AtomicInteger();
     }
 
     public static CounterService getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new CounterService();
+        CounterService result = INSTANCE;
+        if (result == null) {
+            synchronized (mutex) {
+                result = INSTANCE;
+                if (result == null)
+                    INSTANCE = result = new CounterService();
+            }
         }
-        return INSTANCE;
+        return result;
     }
+//    public static CounterService getInstance() {
+//        if (INSTANCE == null) {
+//            INSTANCE = new CounterService();
+//        }
+//        return INSTANCE;
+//    }
 
     public int getCount() {
         return count.get();

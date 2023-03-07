@@ -3,11 +3,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class getData {
-    private final String date;
+    private final ZonedDateTime date;
     private final Integer value;
     getData(int value) {
-        this.date = ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
-                .format(DateTimeFormatter.ISO_INSTANT);
+        this.date = ZonedDateTime.now(ZoneId.of("Europe/Moscow"));
         this.value = value;
     }
 
@@ -15,7 +14,15 @@ public class getData {
         return value;
     }
 
-    public String  getDate() {
+    public ZonedDateTime  getDate() {
         return date;
+    }
+
+    @Override
+    public String toString() {
+        return "getData{" +
+                "date=" + date.format(DateTimeFormatter.ISO_INSTANT) +
+                ", value=" + value +
+                '}';
     }
 }
