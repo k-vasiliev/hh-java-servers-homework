@@ -1,21 +1,20 @@
 package Counter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class JsonMapper {
-	
-	public static String getJson(Object obj) {
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-		try {
-			return objectMapper.writeValueAsString(obj);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			return e.getMessage();
-		}
-	}
+	private static ObjectMapper objectMapper;
 
+	public static ObjectMapper getObjectMapper() {
+		if (objectMapper == null) {
+			objectMapper = new ObjectMapper();
+			objectMapper.registerModule(new JavaTimeModule());
+			objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+			objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		}
+		return objectMapper;
+	}
 
 }

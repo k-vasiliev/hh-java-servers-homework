@@ -14,7 +14,6 @@ public class JerseyApplication {
 		server.setHandler(ctx);
 		ServletHolder jerseyServlet = ctx.addServlet(ServletContainer.class, "/*");
 		jerseyServlet.setInitParameter(ServletProperties.JAXRS_APPLICATION_CLASS, ApplicationConfig.class.getName());
-
 		return server;
 	}
 

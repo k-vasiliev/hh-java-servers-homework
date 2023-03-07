@@ -1,5 +1,8 @@
 package Counter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -17,7 +20,13 @@ public class CounterController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCounter() {
 		JsonObj jsonResponse = new JsonObj(ServiceCounter.getCounter());
-		return Response.ok(JsonMapper.getJson(jsonResponse)).build();
+		ObjectMapper jsonMapper = JsonMapper.getObjectMapper();
+		try {
+			return Response.ok(jsonMapper.writeValueAsString(jsonResponse)).build();
+		} catch (JsonProcessingException e) {
+			return Response.ok("ExceptionError " + e.getMessage()).build();
+		}
+
 	}
 
 	@POST

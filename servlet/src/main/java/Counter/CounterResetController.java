@@ -2,9 +2,9 @@ package Counter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,14 +16,8 @@ public class CounterResetController extends HttpServlet {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
-
-		Cookie ck[] = request.getCookies();
-		boolean flag = false;
-		for (int i = 0; i < ck.length; i++) {
-			if (ck[i].getName().equals("hh-auth") && ck[i].getValue().length() > 10) {
-				flag = true;
-			}
-		}
+		boolean flag = Arrays.stream(request.getCookies())
+				.anyMatch(ck -> ck.getName().equals("hh-auth") && ck.getValue().length() > 10);
 		if (flag == false) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
