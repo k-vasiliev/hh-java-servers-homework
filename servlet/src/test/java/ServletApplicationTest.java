@@ -141,6 +141,9 @@ public class ServletApplicationTest {
     assertEquals(initValue + increaseTo - decreaseTo, result, "Counter is not thread safe");
   }
 
+  // todo тест на отсутствие заголовка Subtraction-Value в операции уменьшения счетчика
+  // todo тест на проверку авторизации из ровно 10 символов
+
   private CompletableFuture<Response> clearCounter(String authCookieValue) {
     CookieStore cookieStore = client.getConfig().getCookieStore();
     String url = HOST + "/counter/clear";
