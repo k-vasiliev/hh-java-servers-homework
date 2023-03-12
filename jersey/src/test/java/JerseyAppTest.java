@@ -1,5 +1,6 @@
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hh.jersey.app.JerseyApplication;
 import io.netty.handler.codec.http.cookie.DefaultCookie;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
