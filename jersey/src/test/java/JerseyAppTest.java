@@ -123,7 +123,6 @@ public class JerseyAppTest {
 
     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
     int result = getCounterValue();
-
     assertEquals(initValue + increaseTo, result, "Counter is not thread safe");
   }
 
