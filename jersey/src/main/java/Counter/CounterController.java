@@ -24,7 +24,9 @@ public class CounterController {
 		try {
 			return Response.ok(jsonMapper.writeValueAsString(jsonResponse)).build();
 		} catch (JsonProcessingException e) {
-			return Response.ok("ExceptionError " + e.getMessage()).build();
+			return Response.status(CustomException.CUSTOM_EXCEPTION_PARSING_JSON.getValue(),
+					"ExceptionError " + e.getMessage()).build();
+			// Response.status(,"ExceptionError " + e.getMessage()).build();
 		}
 
 	}
