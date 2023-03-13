@@ -1,4 +1,14 @@
 .idea
 *.iml
 jersey/target/
+jersey/target/
+jersey/.settings/
+jersey/.classpath
+jersey/.project
 servlet/target/
+servlet/target/
+servlet/.settings/
+servlet/.classpath
+servlet/.project
+.project
+.metadata/
